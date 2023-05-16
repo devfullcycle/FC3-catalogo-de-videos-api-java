@@ -1,6 +1,6 @@
 package com.fullcycle.catalogo.domain;
 
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 
 public final class Fixture {
 

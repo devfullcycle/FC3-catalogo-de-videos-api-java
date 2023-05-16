@@ -6,7 +6,7 @@ plugins {
 group 'com.fullcycle.catalogo.domain'
 
 dependencies {
-    testImplementation 'com.github.javafaker:javafaker:1.0.2'
+    testImplementation('net.datafaker:datafaker:1.9.0')
 }
 
 configurations {
