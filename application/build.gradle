@@ -1,0 +1,12 @@
+plugins {
+    id 'java-conventions'
+    id 'java-library'
+}
+
+group 'com.fullcycle.catalogo.application'
+
+dependencies {
+    implementation(project(":domain"))
+
+    testImplementation(project(path: ':domain', configuration: 'testClasses'))
+}

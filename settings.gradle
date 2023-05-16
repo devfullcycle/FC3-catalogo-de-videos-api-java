@@ -1,0 +1,4 @@
+rootProject.name = 'fc3-catalogo'
+include 'domain'
+include 'application'
+include 'infrastructure'
