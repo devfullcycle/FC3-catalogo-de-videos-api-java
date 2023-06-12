@@ -9,8 +9,25 @@ extend type Query {
     ): [Category]!
 }
 
+extend type Mutation {
+
+    saveCategory(input: CategoryInput!): Category!
+}
+
+""" A Category """
 type Category {
     id: ID!
     name: String!
     description: String
+}
+
+""" A input to persist a Category """
+input CategoryInput {
+    id: ID!
+    name: String!
+    description: String
+    active: Boolean!
+    createdAt: String!
+    updatedAt: String!
+    deletedAt: String
 }

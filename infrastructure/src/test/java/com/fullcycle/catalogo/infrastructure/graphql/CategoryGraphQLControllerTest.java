@@ -2,6 +2,7 @@ package com.fullcycle.catalogo.infrastructure.graphql;
 
 import com.fullcycle.catalogo.application.category.list.ListCategoryOutput;
 import com.fullcycle.catalogo.application.category.list.ListCategoryUseCase;
+import com.fullcycle.catalogo.application.category.save.SaveCategoryUseCase;
 import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.category.CategorySearchQuery;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
@@ -23,6 +24,9 @@ public class CategoryGraphQLControllerTest {
 
     @MockBean
     private ListCategoryUseCase listCategoryUseCase;
+
+    @MockBean
+    private SaveCategoryUseCase saveCategoryUseCase;
 
     @Autowired
     private GraphQlTester graphql;

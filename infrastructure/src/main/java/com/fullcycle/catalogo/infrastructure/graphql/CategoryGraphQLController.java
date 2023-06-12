@@ -2,8 +2,12 @@ package com.fullcycle.catalogo.infrastructure.graphql;
 
 import com.fullcycle.catalogo.application.category.list.ListCategoryOutput;
 import com.fullcycle.catalogo.application.category.list.ListCategoryUseCase;
+import com.fullcycle.catalogo.application.category.save.SaveCategoryUseCase;
+import com.fullcycle.catalogo.domain.category.Category;
 import com.fullcycle.catalogo.domain.category.CategorySearchQuery;
+import com.fullcycle.catalogo.infrastructure.category.models.CategoryDTO;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
@@ -14,9 +18,14 @@ import java.util.Objects;
 public class CategoryGraphQLController {
 
     private final ListCategoryUseCase listCategoryUseCase;
+    private final SaveCategoryUseCase saveCategoryUseCase;
 
-    public CategoryGraphQLController(final ListCategoryUseCase listCategoryUseCase) {
+    public CategoryGraphQLController(
+            final ListCategoryUseCase listCategoryUseCase,
+            final SaveCategoryUseCase saveCategoryUseCase
+    ) {
         this.listCategoryUseCase = Objects.requireNonNull(listCategoryUseCase);
+        this.saveCategoryUseCase = Objects.requireNonNull(saveCategoryUseCase);
     }
 
     @QueryMapping
@@ -32,5 +41,12 @@ public class CategoryGraphQLController {
                 new CategorySearchQuery(page, perPage, search, sort, direction);
 
         return this.listCategoryUseCase.execute(aQuery).data();
+    }
+
+    @MutationMapping
+    public Category saveCategory(@Argument final CategoryDTO input) {
+        final var aCategory = input.toCategory();
+        this.saveCategoryUseCase.execute(aCategory);
+        return aCategory;
     }
 }
