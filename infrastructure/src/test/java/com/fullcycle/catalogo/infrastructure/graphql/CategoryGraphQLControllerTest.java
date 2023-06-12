@@ -18,7 +18,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@GraphQLControllerTest
+@GraphQLControllerTest(controllers = CategoryGraphQLController.class)
 public class CategoryGraphQLControllerTest {
 
     @MockBean
@@ -96,16 +96,23 @@ public class CategoryGraphQLControllerTest {
                 .thenReturn(new Pagination<>(expectedPage, expectedPerPage, expectedCategories.size(), expectedCategories));
 
         final var query = """
-                {
-                  categories(search: "%s", page: %s, perPage: %s, sort: "%s", direction: "%s") {
+                query AllCategories($search: String, $page: Int, $perPage: Int, $sort: String, $direction: String) {
+                                
+                  categories(search: $search, page: $page, perPage: $perPage, sort: $sort, direction: $direction) {
                     id
                     name
                   }
                 }
-                """.formatted(expectedSearch, expectedPage, expectedPerPage, expectedSort, expectedDirection);
+                """;
 
         // when
-        final var res = this.graphql.document(query).execute();
+        final var res = this.graphql.document(query)
+                .variable("search", expectedSearch)
+                .variable("page", expectedPage)
+                .variable("perPage", expectedPerPage)
+                .variable("sort", expectedSort)
+                .variable("direction", expectedDirection)
+                .execute();
 
         final var actualCategories = res.path("categories")
                 .entityList(ListCategoryOutput.class)
