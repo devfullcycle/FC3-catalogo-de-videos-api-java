@@ -29,6 +29,7 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-graphql')
     implementation('org.springframework.boot:spring-boot-starter-security')
     implementation('org.springframework.boot:spring-boot-starter-oauth2-resource-server')
+    implementation('org.springframework.boot:spring-boot-starter-data-elasticsearch')
 
     implementation('com.fasterxml.jackson.module:jackson-module-afterburner')
     
@@ -39,6 +40,7 @@ dependencies {
     testImplementation('org.springframework.security:spring-security-test')
 
     testImplementation('org.testcontainers:testcontainers:1.18.1')
+    testImplementation('org.testcontainers:elasticsearch:1.18.1')
     testImplementation('org.testcontainers:junit-jupiter:1.18.1')
 }
 
