@@ -1,0 +1,33 @@
+
+extend type Query {
+    categories(
+        search: String = "",
+        page: Int = 0,
+        perPage: Int = 10,
+        sort: String = "name",
+        direction: String = "asc"
+    ): [Category]!
+}
+
+extend type Mutation {
+
+    saveCategory(input: CategoryInput!): Category!
+}
+
+""" A Category """
+type Category {
+    id: ID!
+    name: String!
+    description: String
+}
+
+""" A input to persist a Category """
+input CategoryInput {
+    id: ID!
+    name: String!
+    description: String
+    active: Boolean!
+    createdAt: String!
+    updatedAt: String!
+    deletedAt: String
+}
