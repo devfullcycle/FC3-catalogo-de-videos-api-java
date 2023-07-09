@@ -72,24 +72,24 @@ public class CategoryElasticsearchGatewayTest extends AbstractElasticsearchTest 
     @Test
     public void givenValidId_whenCallsFindById_shouldRetrieveIt() {
         // given
-        final var aulas = Fixture.Categories.aulas();
+        final var talks = Fixture.Categories.talks();
 
-        this.categoryRepository.save(CategoryDocument.from(aulas));
+        this.categoryRepository.save(CategoryDocument.from(talks));
 
-        final var expectedId = aulas.id();
+        final var expectedId = talks.id();
         Assertions.assertTrue(this.categoryRepository.existsById(expectedId));
 
         // when
         final var actualOutput = this.categoryGateway.findById(expectedId).get();
 
         // then
-        Assertions.assertEquals(aulas.id(), actualOutput.id());
-        Assertions.assertEquals(aulas.name(), actualOutput.name());
-        Assertions.assertEquals(aulas.description(), actualOutput.description());
-        Assertions.assertEquals(aulas.active(), actualOutput.active());
-        Assertions.assertEquals(aulas.createdAt(), actualOutput.createdAt());
-        Assertions.assertEquals(aulas.updatedAt(), actualOutput.updatedAt());
-        Assertions.assertEquals(aulas.deletedAt(), actualOutput.deletedAt());
+        Assertions.assertEquals(talks.id(), actualOutput.id());
+        Assertions.assertEquals(talks.name(), actualOutput.name());
+        Assertions.assertEquals(talks.description(), actualOutput.description());
+        Assertions.assertEquals(talks.active(), actualOutput.active());
+        Assertions.assertEquals(talks.createdAt(), actualOutput.createdAt());
+        Assertions.assertEquals(talks.updatedAt(), actualOutput.updatedAt());
+        Assertions.assertEquals(talks.deletedAt(), actualOutput.deletedAt());
     }
 
     @Test
