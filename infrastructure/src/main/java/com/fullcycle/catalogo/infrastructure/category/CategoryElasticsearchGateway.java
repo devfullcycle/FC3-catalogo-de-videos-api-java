@@ -4,6 +4,7 @@ import com.fullcycle.catalogo.domain.category.Category;
 import com.fullcycle.catalogo.domain.category.CategoryGateway;
 import com.fullcycle.catalogo.domain.category.CategorySearchQuery;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
+import com.fullcycle.catalogo.infrastructure.category.persistence.CategoryDocument;
 import com.fullcycle.catalogo.infrastructure.category.persistence.CategoryRepository;
 import org.springframework.data.elasticsearch.core.SearchOperations;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,8 @@ public class CategoryElasticsearchGateway implements CategoryGateway {
 
     @Override
     public Category save(Category aCategory) {
-        throw new UnsupportedOperationException();
+        this.categoryRepository.save(CategoryDocument.from(aCategory));
+        return aCategory;
     }
 
     @Override

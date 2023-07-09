@@ -14,7 +14,7 @@ public class CategoryDocument {
 
     @MultiField(
             mainField = @Field(type = FieldType.Text, name = "name"),
-            otherFields = @InnerField(suffix = ".keyword", type = FieldType.Keyword)
+            otherFields = @InnerField(suffix = "keyword", type = FieldType.Keyword)
     )
     private String name;
 
