@@ -1,3 +1,7 @@
+elasticsearch:
+  connect-timeout: 250
+  socket-timeout: 1_000
+
 graphql:
   graphiql: false
 
@@ -15,6 +19,12 @@ server:
       io: 4 # One IO thread per CPU core is a reasonable default: https://undertow.io/undertow-docs/undertow-docs-2.1.0/index.html#listeners-2
 
 spring:
+  elasticsearch:
+    uris: ${elasticsearch.uris}
+    username: ${elasticsearch.username}
+    password: ${elasticsearch.password}
+    connect-timeout: ${elasticsearch.connect-timeout}
+    socket-timeout: ${elasticsearch.socket-timeout}
   graphql:
     graphiql:
       enabled: ${graphql.graphiql}

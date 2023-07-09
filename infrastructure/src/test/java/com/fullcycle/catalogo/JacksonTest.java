@@ -1,4 +1,4 @@
-package com.fullcycle.catalogo.infrastructure;
+package com.fullcycle.catalogo;
 
 import org.junit.jupiter.api.Tag;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
