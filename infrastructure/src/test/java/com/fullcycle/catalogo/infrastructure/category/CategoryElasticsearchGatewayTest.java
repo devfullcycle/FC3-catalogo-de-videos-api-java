@@ -68,4 +68,39 @@ public class CategoryElasticsearchGatewayTest extends AbstractElasticsearchTest 
         // when/then
         Assertions.assertDoesNotThrow(() -> this.categoryGateway.deleteById(expectedId));
     }
+
+    @Test
+    public void givenValidId_whenCallsFindById_shouldRetrieveIt() {
+        // given
+        final var aulas = Fixture.Categories.aulas();
+
+        this.categoryRepository.save(CategoryDocument.from(aulas));
+
+        final var expectedId = aulas.id();
+        Assertions.assertTrue(this.categoryRepository.existsById(expectedId));
+
+        // when
+        final var actualOutput = this.categoryGateway.findById(expectedId).get();
+
+        // then
+        Assertions.assertEquals(aulas.id(), actualOutput.id());
+        Assertions.assertEquals(aulas.name(), actualOutput.name());
+        Assertions.assertEquals(aulas.description(), actualOutput.description());
+        Assertions.assertEquals(aulas.active(), actualOutput.active());
+        Assertions.assertEquals(aulas.createdAt(), actualOutput.createdAt());
+        Assertions.assertEquals(aulas.updatedAt(), actualOutput.updatedAt());
+        Assertions.assertEquals(aulas.deletedAt(), actualOutput.deletedAt());
+    }
+
+    @Test
+    public void givenInvalidId_whenCallsFindById_shouldReturnEmpty() {
+        // given
+        final var expectedId = "any";
+
+        // when
+        final var actualOutput = this.categoryGateway.findById(expectedId);
+
+        // then
+        Assertions.assertTrue(actualOutput.isEmpty());
+    }
 }
