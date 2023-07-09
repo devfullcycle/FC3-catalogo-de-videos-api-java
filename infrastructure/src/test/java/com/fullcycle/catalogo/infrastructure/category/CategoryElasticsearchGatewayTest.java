@@ -168,10 +168,10 @@ public class CategoryElasticsearchGatewayTest extends AbstractElasticsearchTest 
 
     @ParameterizedTest
     @CsvSource({
-            "name,asc,0,10,1,1,Aulas",
-            "name,desc,0,10,1,1,Talks",
-            "created_at,asc,0,10,1,1,Aulas",
-            "created_at,desc,0,10,1,1,Lives",
+            "name,asc,0,10,3,3,Aulas",
+            "name,desc,0,10,3,3,Talks",
+            "created_at,asc,0,10,3,3,Aulas",
+            "created_at,desc,0,10,3,3,Lives",
     })
     public void givenValidSortAndDirection_whenCallsFindAll_shouldReturnElementsSorted(
             final String expectedSort,
@@ -206,7 +206,7 @@ public class CategoryElasticsearchGatewayTest extends AbstractElasticsearchTest 
             "0,1,1,3,Aulas",
             "1,1,1,3,Lives",
             "2,1,1,3,Talks",
-            "3,1,1,3,",
+            "3,1,0,3,",
     })
     public void givenValidPage_whenCallsFindAll_shouldReturnElementsPaged(
             final int expectedPage,
@@ -240,10 +240,8 @@ public class CategoryElasticsearchGatewayTest extends AbstractElasticsearchTest 
     }
 
     private void mockCategories() {
-        this.categoryRepository.saveAll(List.of(
-                CategoryDocument.from(Fixture.Categories.aulas()),
-                CategoryDocument.from(Fixture.Categories.talks()),
-                CategoryDocument.from(Fixture.Categories.lives())
-        ));
+        this.categoryRepository.save(CategoryDocument.from(Fixture.Categories.aulas()));
+        this.categoryRepository.save(CategoryDocument.from(Fixture.Categories.talks()));
+        this.categoryRepository.save(CategoryDocument.from(Fixture.Categories.lives()));
     }
 }
