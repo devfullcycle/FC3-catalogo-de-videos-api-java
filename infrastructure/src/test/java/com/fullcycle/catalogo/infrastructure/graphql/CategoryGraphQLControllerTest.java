@@ -9,7 +9,7 @@ import com.fullcycle.catalogo.domain.category.CategorySearchQuery;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
 import com.fullcycle.catalogo.domain.utils.IdUtils;
 import com.fullcycle.catalogo.domain.utils.InstantUtils;
-import com.fullcycle.catalogo.infrastructure.GraphQLControllerTest;
+import com.fullcycle.catalogo.GraphQLControllerTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
