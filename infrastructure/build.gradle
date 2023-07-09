@@ -2,7 +2,7 @@ plugins {
     id 'java-conventions'
     id 'jacoco-report-aggregation'
     id 'application'
-    id 'org.springframework.boot' version '3.0.6'
+    id 'org.springframework.boot' version '3.1.1'
     id 'io.spring.dependency-management' version '1.1.0'
 }
 
@@ -36,12 +36,13 @@ dependencies {
     testImplementation(project(path: ':domain', configuration: 'testClasses'))
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('org.springframework.boot:spring-boot-testcontainers')
     testImplementation('org.springframework.graphql:spring-graphql-test')
     testImplementation('org.springframework.security:spring-security-test')
 
-    testImplementation('org.testcontainers:testcontainers:1.18.1')
-    testImplementation('org.testcontainers:elasticsearch:1.18.1')
-    testImplementation('org.testcontainers:junit-jupiter:1.18.1')
+    testImplementation('org.testcontainers:testcontainers:1.18.3')
+    testImplementation('org.testcontainers:elasticsearch:1.18.3')
+    testImplementation('org.testcontainers:junit-jupiter:1.18.3')
 }
 
 testCodeCoverageReport {
