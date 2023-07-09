@@ -2,11 +2,17 @@ package com.fullcycle.catalogo.infrastructure.category;
 
 import com.fullcycle.catalogo.AbstractElasticsearchTest;
 import com.fullcycle.catalogo.domain.Fixture;
+import com.fullcycle.catalogo.domain.category.CategorySearchQuery;
 import com.fullcycle.catalogo.infrastructure.category.persistence.CategoryDocument;
 import com.fullcycle.catalogo.infrastructure.category.persistence.CategoryRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
 
 public class CategoryElasticsearchGatewayTest extends AbstractElasticsearchTest {
 
@@ -102,5 +108,142 @@ public class CategoryElasticsearchGatewayTest extends AbstractElasticsearchTest 
 
         // then
         Assertions.assertTrue(actualOutput.isEmpty());
+    }
+
+    @Test
+    public void givenEmptyCategories_whenCallsFindAll_shouldReturnEmptyList() {
+        // given
+        final var expectedPage = 0;
+        final var expectedPerPage = 10;
+        final var expectedTerms = "";
+        final var expectedSort = "name";
+        final var expectedDirection = "asc";
+        final var expectedTotal = 0;
+
+        final var aQuery =
+                new CategorySearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection);
+
+        // when
+        final var actualOutput = this.categoryGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedTotal, actualOutput.data().size());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "aul,0,10,1,1,Aulas",
+            "liv,0,10,1,1,Lives"
+    })
+    public void givenValidTerm_whenCallsFindAll_shouldReturnElementsFiltered(
+            final String expectedTerms,
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedName
+    ) {
+        // given
+        mockCategories();
+
+        final var expectedSort = "name";
+        final var expectedDirection = "asc";
+
+        final var aQuery =
+                new CategorySearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection);
+
+        // when
+        final var actualOutput = this.categoryGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+        Assertions.assertEquals(expectedName, actualOutput.data().get(0).name());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "name,asc,0,10,1,1,Aulas",
+            "name,desc,0,10,1,1,Talks",
+            "created_at,asc,0,10,1,1,Aulas",
+            "created_at,desc,0,10,1,1,Lives",
+    })
+    public void givenValidSortAndDirection_whenCallsFindAll_shouldReturnElementsSorted(
+            final String expectedSort,
+            final String expectedDirection,
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedName
+    ) {
+        // given
+        mockCategories();
+
+        final var expectedTerms = "";
+
+        final var aQuery =
+                new CategorySearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection);
+
+        // when
+        final var actualOutput = this.categoryGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+        Assertions.assertEquals(expectedName, actualOutput.data().get(0).name());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "0,1,1,3,Aulas",
+            "1,1,1,3,Lives",
+            "2,1,1,3,Talks",
+            "3,1,1,3,",
+    })
+    public void givenValidPage_whenCallsFindAll_shouldReturnElementsPaged(
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedName
+    ) {
+        // given
+        mockCategories();
+
+        final var expectedTerms = "";
+        final var expectedSort = "name";
+        final var expectedDirection = "asc";
+
+        final var aQuery =
+                new CategorySearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection);
+
+        // when
+        final var actualOutput = this.categoryGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+
+        if (StringUtils.isNotEmpty(expectedName)) {
+            Assertions.assertEquals(expectedName, actualOutput.data().get(0).name());
+        }
+    }
+
+    private void mockCategories() {
+        this.categoryRepository.saveAll(List.of(
+                CategoryDocument.from(Fixture.Categories.aulas()),
+                CategoryDocument.from(Fixture.Categories.talks()),
+                CategoryDocument.from(Fixture.Categories.lives())
+        ));
     }
 }
