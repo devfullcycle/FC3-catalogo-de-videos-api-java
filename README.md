@@ -16,3 +16,11 @@
 - JDK 17
 - IDE de sua preferência
 - Docker
+
+## Kafka Connect
+
+### Debezium
+
+```sql
+ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '123456';
+```
