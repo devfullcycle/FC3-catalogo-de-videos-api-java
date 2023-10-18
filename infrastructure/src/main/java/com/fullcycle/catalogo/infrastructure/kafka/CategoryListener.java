@@ -1,7 +1,13 @@
 package com.fullcycle.catalogo.infrastructure.kafka;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fullcycle.catalogo.application.category.delete.DeleteCategoryUseCase;
 import com.fullcycle.catalogo.application.category.save.SaveCategoryUseCase;
+import com.fullcycle.catalogo.infrastructure.category.CategoryGateway;
+import com.fullcycle.catalogo.infrastructure.category.models.CategoryEvent;
+import com.fullcycle.catalogo.infrastructure.configuration.json.Json;
+import com.fullcycle.catalogo.infrastructure.kafka.models.connect.MessageValue;
+import com.fullcycle.catalogo.infrastructure.kafka.models.connect.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.DltHandler;
@@ -19,14 +25,19 @@ import java.util.Objects;
 public class CategoryListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(CategoryListener.class);
+    public static final TypeReference<MessageValue<CategoryEvent>> CATEGORY_MESSAGE = new TypeReference<>() {
+    };
 
+    private final CategoryGateway categoryGateway;
     private final SaveCategoryUseCase saveCategoryUseCase;
     private final DeleteCategoryUseCase deleteCategoryUseCase;
 
     public CategoryListener(
+            final CategoryGateway categoryGateway,
             final SaveCategoryUseCase saveCategoryUseCase,
             final DeleteCategoryUseCase deleteCategoryUseCase
     ) {
+        this.categoryGateway = Objects.requireNonNull(categoryGateway);
         this.saveCategoryUseCase = Objects.requireNonNull(saveCategoryUseCase);
         this.deleteCategoryUseCase = Objects.requireNonNull(deleteCategoryUseCase);
     }
@@ -48,7 +59,17 @@ public class CategoryListener {
     )
     public void onMessage(@Payload final String payload, final ConsumerRecordMetadata metadata) {
         LOG.info("Message received from Kafka [topic:{}] [partition:{}] [offset:{}]: {}", metadata.topic(), metadata.partition(), metadata.offset(), payload);
-        throw new RuntimeException("BOOM!");
+        final var messagePayload = Json.readValue(payload, CATEGORY_MESSAGE).payload();
+        final var op = messagePayload.operation();
+
+        if (Operation.isDelete(op)) {
+            this.deleteCategoryUseCase.execute(messagePayload.before().id());
+        } else {
+            this.categoryGateway.categoryOfId(messagePayload.after().id())
+                    .ifPresentOrElse(this.saveCategoryUseCase::execute, () -> {
+                        LOG.warn("Category was not found {}", messagePayload.after().id());
+                    });
+        }
     }
 
     @DltHandler

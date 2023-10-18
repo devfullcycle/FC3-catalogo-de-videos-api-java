@@ -3,7 +3,7 @@ elasticsearch:
   socket-timeout: 1_000
 
 graphql:
-  graphiql: false
+  graphiql: true
 
 kafka:
   auto-create-topics: false
