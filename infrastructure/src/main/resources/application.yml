@@ -12,7 +12,7 @@ kafka:
   consumers:
     categories:
       auto-offset-reset: earliest
-      concurrency: 3
+      concurrency: 1
       id: kafka-listener-categories
       topics: adm_videos_mysql.adm_videos.categories
       group-id: catalogo-service
