@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
-@Profile("!development")
+@Profile("!development & !sandbox")
 public class SecurityConfig {
 
     private static final String ROLE_ADMIN = "CATALOGO_ADMIN";
