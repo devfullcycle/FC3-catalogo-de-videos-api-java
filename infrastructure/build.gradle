@@ -30,11 +30,11 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-security')
     implementation('org.springframework.boot:spring-boot-starter-oauth2-resource-server')
     implementation('org.springframework.boot:spring-boot-starter-data-elasticsearch')
-
+    implementation("org.springframework.cloud:spring-cloud-contract-wiremock")
     implementation('org.springframework.kafka:spring-kafka')
 
     implementation('com.fasterxml.jackson.module:jackson-module-afterburner')
-    
+
     testImplementation(project(path: ':domain', configuration: 'testClasses'))
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
@@ -47,6 +47,12 @@ dependencies {
     testImplementation('org.testcontainers:elasticsearch:1.18.3')
     testImplementation('org.testcontainers:kafka:1.18.3')
     testImplementation('org.testcontainers:junit-jupiter:1.18.3')
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2023.0.0"
+    }
 }
 
 testCodeCoverageReport {
