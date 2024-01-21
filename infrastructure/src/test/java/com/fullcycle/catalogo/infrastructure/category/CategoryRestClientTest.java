@@ -4,6 +4,7 @@ import com.fullcycle.catalogo.AbstractRestClientTest;
 import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.exceptions.InternalErrorException;
 import com.fullcycle.catalogo.infrastructure.category.models.CategoryDTO;
+import io.github.resilience4j.bulkhead.BulkheadFullException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import java.util.Map;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class CategoryRestClientTest extends AbstractRestClientTest {
-
 
     @Autowired
     private CategoryRestClient target;
@@ -147,5 +147,21 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
         Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
 
         verify(2, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(aulas.id()))));
+    }
+
+    @Test
+    public void givenACategory_whenBulkheadIsFull_shouldReturnError() {
+        // given
+        final var expectedErrorMessage = "Bulkhead 'categories' is full and does not permit further calls";
+
+        acquireBulkheadPermission(CATEGORY);
+
+        // when
+        final var actualEx = Assertions.assertThrows(BulkheadFullException.class, () -> target.getById("123"));
+
+        // then
+        Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
+
+        releaseBulkheadPermission(CATEGORY);
     }
 }

@@ -16,6 +16,11 @@ rest-client:
   categories:
     read-timeout: 300
 
+resilience4j.bulkhead:
+  configs:
+    default:
+      maxConcurrentCalls: 1
+
 resilience4j.retry:
   configs:
     default:

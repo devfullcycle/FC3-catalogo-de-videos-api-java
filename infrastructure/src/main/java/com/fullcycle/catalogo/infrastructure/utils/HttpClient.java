@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 
+import java.net.http.HttpConnectTimeoutException;
+import java.net.http.HttpTimeoutException;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
@@ -39,9 +41,15 @@ public interface HttpClient {
         } catch (NotFoundException ex) {
             return Optional.empty();
         } catch (ResourceAccessException ex) {
-            if (ExceptionUtils.getRootCause(ex) instanceof TimeoutException) {
+            final var cause = ExceptionUtils.getRootCause(ex);
+            if (cause instanceof HttpConnectTimeoutException) {
+                throw InternalErrorException.with("ConnectTimeout observed from %s [resourceId:%s]".formatted(namespace(), id), ex);
+            }
+
+            if (cause instanceof HttpTimeoutException || cause instanceof TimeoutException) {
                 throw InternalErrorException.with("Timeout observed from %s [resourceId:%s]".formatted(namespace(), id), ex);
             }
+
             throw ex;
         }
     }

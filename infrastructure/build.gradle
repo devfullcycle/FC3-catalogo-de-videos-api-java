@@ -37,6 +37,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-afterburner")
 
     implementation("io.github.resilience4j:resilience4j-spring-boot3")
+    implementation("io.github.resilience4j:resilience4j-bulkhead")
     implementation("io.github.resilience4j:resilience4j-retry")
 
     testImplementation(project(path: ':domain', configuration: 'testClasses'))
