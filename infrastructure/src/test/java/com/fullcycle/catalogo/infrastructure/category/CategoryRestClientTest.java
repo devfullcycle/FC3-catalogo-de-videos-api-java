@@ -1,5 +1,6 @@
 package com.fullcycle.catalogo.infrastructure.category;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fullcycle.catalogo.IntegrationTestConfiguration;
 import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.exceptions.InternalErrorException;
@@ -14,8 +15,9 @@ import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRe
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Map;
@@ -58,6 +60,7 @@ public class CategoryRestClientTest {
                 get(urlPathEqualTo("/api/categories/%s".formatted(aulas.id())))
                         .willReturn(aResponse()
                                 .withStatus(200)
+                                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                                 .withBody(responseBody)
                         )
         );
@@ -88,6 +91,7 @@ public class CategoryRestClientTest {
                 get(urlPathEqualTo("/api/categories/%s".formatted(expectedId)))
                         .willReturn(aResponse()
                                 .withStatus(500)
+                                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                                 .withBody(responseBody)
                         )
         );
@@ -110,6 +114,7 @@ public class CategoryRestClientTest {
                 get(urlPathEqualTo("/api/categories/%s".formatted(expectedId)))
                         .willReturn(aResponse()
                                 .withStatus(404)
+                                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                                 .withBody(responseBody)
                         )
         );
@@ -143,6 +148,7 @@ public class CategoryRestClientTest {
                 get(urlPathEqualTo("/api/categories/%s".formatted(aulas.id())))
                         .willReturn(aResponse()
                                 .withStatus(200)
+                                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                                 .withFixedDelay(600)
                                 .withBody(responseBody)
                         )

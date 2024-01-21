@@ -17,6 +17,10 @@ kafka:
       topics: adm_videos_mysql.adm_videos.categories
       group-id: catalogo-service
 
+rest-client:
+  categories:
+    base-url: "${rest-client.base-url}/api/categories"
+
 server:
   port: 8080
   servlet:
