@@ -11,6 +11,7 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpTimeoutException;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -40,18 +41,30 @@ public interface HttpClient {
         } catch (NotFoundException ex) {
             return Optional.empty();
         } catch (ResourceAccessException ex) {
-            final var cause = ExceptionUtils.getRootCause(ex);
-            if (cause instanceof HttpConnectTimeoutException) {
-                throw InternalErrorException.with("ConnectTimeout observed from %s [resourceId:%s]".formatted(namespace(), id), ex);
-            }
-
-            if (cause instanceof HttpTimeoutException) {
-                throw InternalErrorException.with("Timeout observed from %s [resourceId:%s]".formatted(namespace(), id), ex);
-            }
-
-            throw ex;
+            throw handleResourceAccessException(id, ex);
         } catch (Throwable t) {
-            throw InternalErrorException.with("Unhandled error observed from %s [resourceId:%s]".formatted(namespace(), id), t);
+            throw handleThrowable(id, t);
         }
+    }
+
+    private InternalErrorException handleResourceAccessException(final String id, final ResourceAccessException ex) {
+        final var cause = ExceptionUtils.getRootCause(ex);
+        if (cause instanceof HttpConnectTimeoutException) {
+            return InternalErrorException.with("ConnectTimeout observed from %s [resourceId:%s]".formatted(namespace(), id), ex);
+        }
+
+        if (cause instanceof HttpTimeoutException || cause instanceof TimeoutException) {
+            return InternalErrorException.with("Timeout observed from %s [resourceId:%s]".formatted(namespace(), id), ex);
+        }
+
+        return InternalErrorException.with("Error observed from %s [resourceId:%s]".formatted(namespace(), id), ex);
+    }
+
+    private InternalErrorException handleThrowable(final String id, final Throwable t) {
+        if (t instanceof InternalErrorException ex) {
+            return ex;
+        }
+
+        return InternalErrorException.with("Unhandled error observed from %s [resourceId:%s]".formatted(namespace(), id), t);
     }
 }

@@ -168,6 +168,23 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
     }
 
     @Test
+    public void givenCall_whenCBIsOpen_shouldReturnError() {
+        // given
+        transitionToOpenState(CATEGORY);
+        final var expectedId = "123";
+        final var expectedErrorMessage = "CircuitBreaker 'categories' is OPEN and does not permit further calls";
+
+        // when
+        final var actualEx = Assertions.assertThrows(CallNotPermittedException.class, () -> this.target.getById(expectedId));
+
+        // then
+        checkCircuitBreakerState(CATEGORY, CircuitBreaker.State.OPEN);
+        Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
+
+        verify(0, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(expectedId))));
+    }
+
+    @Test
     public void givenServerError_whenIsMoreThanThreshold_shouldOpenCircuitBreaker() {
         // given
         final var expectedId = "123";
@@ -185,12 +202,13 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
         );
 
         // when
+        Assertions.assertThrows(InternalErrorException.class, () -> this.target.getById(expectedId));
         final var actualEx = Assertions.assertThrows(CallNotPermittedException.class, () -> this.target.getById(expectedId));
 
         // then
         checkCircuitBreakerState(CATEGORY, CircuitBreaker.State.OPEN);
         Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
 
-        verify(1, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(expectedId))));
+        verify(3, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(expectedId))));
     }
 }

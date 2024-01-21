@@ -20,7 +20,7 @@ resilience4j.bulkhead:
 resilience4j.circuitbreaker:
   configs:
     default:
-      minimumNumberOfCalls: 1
+      minimumNumberOfCalls: 3
       permittedNumberOfCallsInHalfOpenState: 1
       failureRateThreshold: 50
       slowCallRateThreshold: 50
