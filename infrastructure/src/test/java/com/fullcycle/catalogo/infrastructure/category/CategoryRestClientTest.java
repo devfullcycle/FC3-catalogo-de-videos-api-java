@@ -1,52 +1,32 @@
 package com.fullcycle.catalogo.infrastructure.category;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fullcycle.catalogo.IntegrationTestConfiguration;
+import com.fullcycle.catalogo.AbstractRestClientTest;
 import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.exceptions.InternalErrorException;
 import com.fullcycle.catalogo.infrastructure.category.models.CategoryDTO;
-import com.fullcycle.catalogo.infrastructure.configuration.WebServerConfig;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration;
-import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 
-import java.io.IOException;
 import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
-@ActiveProfiles("test-integration")
-@AutoConfigureWireMock(port = 0)
-@EnableAutoConfiguration(exclude = {
-        ElasticsearchRepositoriesAutoConfiguration.class,
-        KafkaAutoConfiguration.class,
-})
-@SpringBootTest(classes = {WebServerConfig.class, IntegrationTestConfiguration.class})
-@Tag("integrationTest")
-public class CategoryRestClientTest {
+public class CategoryRestClientTest extends AbstractRestClientTest {
 
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private CategoryRestClient target;
 
     // OK
     @Test
-    public void givenACategory_whenReceive200FromServer_shouldBeOk() throws IOException {
+    public void givenACategory_whenReceive200FromServer_shouldBeOk() {
         // given
         final var aulas = Fixture.Categories.aulas();
 
-        final var responseBody = objectMapper.writeValueAsString(new CategoryDTO(
+        final var responseBody = writeValueAsString(new CategoryDTO(
                 aulas.id(),
                 aulas.name(),
                 aulas.description(),
@@ -80,12 +60,12 @@ public class CategoryRestClientTest {
 
     // 5XX
     @Test
-    public void givenACategory_whenReceive5xxFromServer_shouldReturnInternalError() throws IOException {
+    public void givenACategory_whenReceive5xxFromServer_shouldReturnInternalError() {
         // given
         final var expectedId = "123";
-        final var expectedErrorMessage = "Failed to get Category of id %s".formatted(expectedId);
+        final var expectedErrorMessage = "Error observed from categories [resourceId:%s] [status:500]".formatted(expectedId);
 
-        final var responseBody = objectMapper.writeValueAsString(Map.of("message", "Internal Server Error"));
+        final var responseBody = writeValueAsString(Map.of("message", "Internal Server Error"));
 
         stubFor(
                 get(urlPathEqualTo("/api/categories/%s".formatted(expectedId)))
@@ -105,10 +85,10 @@ public class CategoryRestClientTest {
 
     // 404
     @Test
-    public void givenACategory_whenReceive404NotFoundFromServer_shouldReturnEmpty() throws IOException {
+    public void givenACategory_whenReceive404NotFoundFromServer_shouldReturnEmpty() {
         // given
         final var expectedId = "123";
-        final var responseBody = objectMapper.writeValueAsString(Map.of("message", "Not found"));
+        final var responseBody = writeValueAsString(Map.of("message", "Not found"));
 
         stubFor(
                 get(urlPathEqualTo("/api/categories/%s".formatted(expectedId)))
@@ -128,12 +108,12 @@ public class CategoryRestClientTest {
 
     // Timeout
     @Test
-    public void givenACategory_whenReceiveTimeout_shouldReturnInternalError() throws IOException {
+    public void givenACategory_whenReceiveTimeout_shouldReturnInternalError() {
         // given
         final var aulas = Fixture.Categories.aulas();
-        final var expectedErrorMessage = "Timeout from category of ID %s".formatted(aulas.id());
+        final var expectedErrorMessage = "Timeout observed from categories [resourceId:%s]".formatted(aulas.id());
 
-        final var responseBody = objectMapper.writeValueAsString(new CategoryDTO(
+        final var responseBody = writeValueAsString(new CategoryDTO(
                 aulas.id(),
                 aulas.name(),
                 aulas.description(),
