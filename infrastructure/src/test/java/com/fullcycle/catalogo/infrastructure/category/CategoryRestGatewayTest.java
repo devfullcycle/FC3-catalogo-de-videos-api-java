@@ -17,10 +17,10 @@ import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
-public class CategoryRestClientTest extends AbstractRestClientTest {
+public class CategoryRestGatewayTest extends AbstractRestClientTest {
 
     @Autowired
-    private CategoryRestClient target;
+    private CategoryRestGateway target;
 
     // OK
     @Test
@@ -48,7 +48,7 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
         );
 
         // when
-        final var actualCategory = target.getById(aulas.id()).get();
+        final var actualCategory = target.categoryOfId(aulas.id()).get();
 
         // then
         Assertions.assertEquals(aulas.id(), actualCategory.id());
@@ -87,9 +87,9 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
         );
 
         // when
-        target.getById(aulas.id()).get();
-        target.getById(aulas.id()).get();
-        final var actualCategory = target.getById(aulas.id()).get();
+        target.categoryOfId(aulas.id()).get();
+        target.categoryOfId(aulas.id()).get();
+        final var actualCategory = target.categoryOfId(aulas.id()).get();
 
         // then
         Assertions.assertEquals(aulas.id(), actualCategory.id());
@@ -125,7 +125,7 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
         );
 
         // when
-        final var actualEx = Assertions.assertThrows(InternalErrorException.class, () -> target.getById(expectedId));
+        final var actualEx = Assertions.assertThrows(InternalErrorException.class, () -> target.categoryOfId(expectedId));
 
         // then
         Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
@@ -150,7 +150,7 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
         );
 
         // when
-        final var actualCategory = target.getById(expectedId);
+        final var actualCategory = target.categoryOfId(expectedId);
 
         // then
         Assertions.assertTrue(actualCategory.isEmpty());
@@ -187,7 +187,7 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
         );
 
         // when
-        final var actualEx = Assertions.assertThrows(InternalErrorException.class, () -> target.getById(aulas.id()));
+        final var actualEx = Assertions.assertThrows(InternalErrorException.class, () -> target.categoryOfId(aulas.id()));
 
         // then
         Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
@@ -203,7 +203,7 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
         acquireBulkheadPermission(CATEGORY);
 
         // when
-        final var actualEx = Assertions.assertThrows(BulkheadFullException.class, () -> target.getById("123"));
+        final var actualEx = Assertions.assertThrows(BulkheadFullException.class, () -> target.categoryOfId("123"));
 
         // then
         Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
@@ -219,7 +219,7 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
         final var expectedErrorMessage = "CircuitBreaker 'categories' is OPEN and does not permit further calls";
 
         // when
-        final var actualEx = Assertions.assertThrows(CallNotPermittedException.class, () -> this.target.getById(expectedId));
+        final var actualEx = Assertions.assertThrows(CallNotPermittedException.class, () -> this.target.categoryOfId(expectedId));
 
         // then
         checkCircuitBreakerState(CATEGORY, CircuitBreaker.State.OPEN);
@@ -246,8 +246,8 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
         );
 
         // when
-        Assertions.assertThrows(InternalErrorException.class, () -> this.target.getById(expectedId));
-        final var actualEx = Assertions.assertThrows(CallNotPermittedException.class, () -> this.target.getById(expectedId));
+        Assertions.assertThrows(InternalErrorException.class, () -> this.target.categoryOfId(expectedId));
+        final var actualEx = Assertions.assertThrows(CallNotPermittedException.class, () -> this.target.categoryOfId(expectedId));
 
         // then
         checkCircuitBreakerState(CATEGORY, CircuitBreaker.State.OPEN);

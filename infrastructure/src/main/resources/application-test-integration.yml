@@ -1,3 +1,6 @@
+cache:
+  type: simple
+
 elasticsearch:
   uris: http://localhost:9200
   username: elastic
