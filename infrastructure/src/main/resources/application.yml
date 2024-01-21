@@ -64,6 +64,30 @@ resilience4j.bulkhead:
       categories:
         baseConfig: default
 
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      registerHealthIndicator: true
+      slidingWindowType: COUNT_BASED
+      slidingWindowSize: 100
+      minimumNumberOfCalls: 20
+      permittedNumberOfCallsInHalfOpenState: 10
+      waitDurationInOpenState: 30s
+      failureRateThreshold: 50
+      slowCallRateThreshold: 70
+      slowCallDurationThreshold: 2_000
+      recordExceptions:
+        - com.fullcycle.catalogo.domain.exceptions.InternalErrorException
+        - org.springframework.web.client.ResourceAccessException
+        - org.springframework.web.client.HttpServerErrorException.InternalServerError
+        - org.springframework.web.client.HttpServerErrorException.GatewayTimeout
+        - org.springframework.web.client.HttpServerErrorException.ServiceUnavailable
+        - java.net.SocketTimeoutException
+        - java.net.http.HttpConnectTimeoutException
+        - java.net.http.HttpTimeoutException
+        - java.util.concurrent.TimeoutException
+        - java.io.IOException
+
 resilience4j.retry:
   configs:
     default:
@@ -76,6 +100,8 @@ resilience4j.retry:
         - org.springframework.web.client.HttpServerErrorException.GatewayTimeout
         - org.springframework.web.client.HttpServerErrorException.ServiceUnavailable
         - java.net.SocketTimeoutException
+        - java.net.http.HttpConnectTimeoutException
+        - java.net.http.HttpTimeoutException
         - java.util.concurrent.TimeoutException
         - java.io.IOException
   instances:

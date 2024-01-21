@@ -5,6 +5,8 @@ import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.exceptions.InternalErrorException;
 import com.fullcycle.catalogo.infrastructure.category.models.CategoryDTO;
 import io.github.resilience4j.bulkhead.BulkheadFullException;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,5 +165,32 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
         Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
 
         releaseBulkheadPermission(CATEGORY);
+    }
+
+    @Test
+    public void givenServerError_whenIsMoreThanThreshold_shouldOpenCircuitBreaker() {
+        // given
+        final var expectedId = "123";
+        final var expectedErrorMessage = "CircuitBreaker 'categories' is OPEN and does not permit further calls";
+
+        final var responseBody = writeValueAsString(Map.of("message", "Internal Server Error"));
+
+        stubFor(
+                get(urlPathEqualTo("/api/categories/%s".formatted(expectedId)))
+                        .willReturn(aResponse()
+                                .withStatus(500)
+                                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                                .withBody(responseBody)
+                        )
+        );
+
+        // when
+        final var actualEx = Assertions.assertThrows(CallNotPermittedException.class, () -> this.target.getById(expectedId));
+
+        // then
+        checkCircuitBreakerState(CATEGORY, CircuitBreaker.State.OPEN);
+        Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
+
+        verify(1, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(expectedId))));
     }
 }

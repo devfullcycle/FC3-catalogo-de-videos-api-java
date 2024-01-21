@@ -6,6 +6,9 @@ import com.fullcycle.catalogo.infrastructure.category.CategoryRestClient;
 import com.fullcycle.catalogo.infrastructure.configuration.WebServerConfig;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +39,19 @@ public abstract class AbstractRestClientTest {
     @Autowired
     private BulkheadRegistry bulkheadRegistry;
 
+    @Autowired
+    private CircuitBreakerRegistry circuitBreakerRegistry;
+
     @BeforeEach
     void beforeEach() {
         WireMock.reset();
         WireMock.resetAllRequests();
         List.of(CATEGORY).forEach(this::resetFaultTolerance);
+    }
+
+    protected void checkCircuitBreakerState(final String name, final CircuitBreaker.State expectedState) {
+        final var cb = circuitBreakerRegistry.circuitBreaker(name);
+        Assertions.assertEquals(expectedState, cb.getState());
     }
 
     protected void acquireBulkheadPermission(final String name) {
@@ -49,6 +60,14 @@ public abstract class AbstractRestClientTest {
 
     protected void releaseBulkheadPermission(final String name) {
         bulkheadRegistry.bulkhead(name).releasePermission();
+    }
+
+    protected void transitionToOpenState(final String name) {
+        circuitBreakerRegistry.circuitBreaker(name).transitionToOpenState();
+    }
+
+    protected void transitionToClosedState(final String name) {
+        circuitBreakerRegistry.circuitBreaker(name).transitionToClosedState();
     }
 
     protected String writeValueAsString(final Object obj) {
@@ -60,6 +79,6 @@ public abstract class AbstractRestClientTest {
     }
 
     private void resetFaultTolerance(final String name) {
-
+        circuitBreakerRegistry.circuitBreaker(name).reset();
     }
 }
