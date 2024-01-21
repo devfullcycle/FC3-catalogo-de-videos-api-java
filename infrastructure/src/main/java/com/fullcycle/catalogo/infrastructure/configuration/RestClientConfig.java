@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class RestClientConfig {
 
     @Bean

@@ -14,7 +14,7 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import java.util.HashMap;
 import java.util.Map;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class KafkaConfig {
 
     private final KafkaProperties properties;

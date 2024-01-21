@@ -1,3 +1,9 @@
+cache:
+  type: cache2k
+  names: admin-categories
+  max-entries: 200
+  ttl: 60 # seconds
+
 elasticsearch:
   connect-timeout: 250
   socket-timeout: 1_000
@@ -35,6 +41,9 @@ server:
       io: 4 # One IO thread per CPU core is a reasonable default: https://undertow.io/undertow-docs/undertow-docs-2.1.0/index.html#listeners-2
 
 spring:
+  cache:
+    cache-names: ${cache.names}
+    type: ${cache.type}
   elasticsearch:
     uris: ${elasticsearch.uris}
     username: ${elasticsearch.username}

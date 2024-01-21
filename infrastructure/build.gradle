@@ -13,11 +13,26 @@ bootJar {
     destinationDirectory.set(file("${rootProject.buildDir}/libs"))
 }
 
+ext {
+    cache2k = "2.6.1.Final"
+}
+
 dependencies {
     implementation(project(":domain"))
     implementation(project(":application"))
 
     implementation("com.google.guava:guava:33.0.0-jre")
+
+    implementation("com.fasterxml.jackson.module:jackson-module-afterburner")
+
+    implementation("io.github.resilience4j:resilience4j-spring-boot3")
+    implementation("io.github.resilience4j:resilience4j-bulkhead")
+    implementation("io.github.resilience4j:resilience4j-circuitbreaker")
+    implementation("io.github.resilience4j:resilience4j-retry")
+
+    implementation("org.cache2k:cache2k-api:$cache2k")
+    implementation("org.cache2k:cache2k-spring:$cache2k")
+    runtimeOnly("org.cache2k:cache2k-core:$cache2k")
 
     implementation("org.springdoc:springdoc-openapi-webmvc-core:1.7.0")
     implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
@@ -26,6 +41,7 @@ dependencies {
         exclude module: 'spring-boot-starter-tomcat'
     }
     implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-undertow")
     implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -33,13 +49,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
     implementation("org.springframework.cloud:spring-cloud-contract-wiremock")
     implementation("org.springframework.kafka:spring-kafka")
-
-    implementation("com.fasterxml.jackson.module:jackson-module-afterburner")
-
-    implementation("io.github.resilience4j:resilience4j-spring-boot3")
-    implementation("io.github.resilience4j:resilience4j-bulkhead")
-    implementation("io.github.resilience4j:resilience4j-circuitbreaker")
-    implementation("io.github.resilience4j:resilience4j-retry")
 
     testImplementation(project(path: ':domain', configuration: 'testClasses'))
 

@@ -62,11 +62,55 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
         verify(1, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(aulas.id()))));
     }
 
+    @Test
+    public void givenACategory_whenReceiveTwoCalls_shouldReturnCachedValue() {
+        // given
+        final var aulas = Fixture.Categories.aulas();
+
+        final var responseBody = writeValueAsString(new CategoryDTO(
+                aulas.id(),
+                aulas.name(),
+                aulas.description(),
+                aulas.active(),
+                aulas.createdAt(),
+                aulas.updatedAt(),
+                aulas.deletedAt()
+        ));
+
+        stubFor(
+                get(urlPathEqualTo("/api/categories/%s".formatted(aulas.id())))
+                        .willReturn(aResponse()
+                                .withStatus(200)
+                                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                                .withBody(responseBody)
+                        )
+        );
+
+        // when
+        target.getById(aulas.id()).get();
+        target.getById(aulas.id()).get();
+        final var actualCategory = target.getById(aulas.id()).get();
+
+        // then
+        Assertions.assertEquals(aulas.id(), actualCategory.id());
+        Assertions.assertEquals(aulas.name(), actualCategory.name());
+        Assertions.assertEquals(aulas.description(), actualCategory.description());
+        Assertions.assertEquals(aulas.active(), actualCategory.active());
+        Assertions.assertEquals(aulas.createdAt(), actualCategory.createdAt());
+        Assertions.assertEquals(aulas.updatedAt(), actualCategory.updatedAt());
+        Assertions.assertEquals(aulas.deletedAt(), actualCategory.deletedAt());
+
+        final var actualCachedValue = cache("admin-categories").get(aulas.id());
+        Assertions.assertEquals(actualCategory, actualCachedValue.get());
+
+        verify(1, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(aulas.id()))));
+    }
+
     // 5XX
     @Test
     public void givenACategory_whenReceive5xxFromServer_shouldReturnInternalError() {
         // given
-        final var expectedId = "123";
+        final var expectedId = "456";
         final var expectedErrorMessage = "Error observed from categories [resourceId:%s] [status:500]".formatted(expectedId);
 
         final var responseBody = writeValueAsString(Map.of("message", "Internal Server Error"));
