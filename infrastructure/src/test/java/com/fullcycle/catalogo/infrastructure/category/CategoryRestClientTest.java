@@ -56,6 +56,8 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
         Assertions.assertEquals(aulas.createdAt(), actualCategory.createdAt());
         Assertions.assertEquals(aulas.updatedAt(), actualCategory.updatedAt());
         Assertions.assertEquals(aulas.deletedAt(), actualCategory.deletedAt());
+
+        verify(1, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(aulas.id()))));
     }
 
     // 5XX
@@ -81,6 +83,8 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
 
         // then
         Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
+
+        verify(2, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(expectedId))));
     }
 
     // 404
@@ -104,6 +108,8 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
 
         // then
         Assertions.assertTrue(actualCategory.isEmpty());
+
+        verify(1, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(expectedId))));
     }
 
     // Timeout
@@ -139,5 +145,7 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
 
         // then
         Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
+
+        verify(2, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(aulas.id()))));
     }
 }

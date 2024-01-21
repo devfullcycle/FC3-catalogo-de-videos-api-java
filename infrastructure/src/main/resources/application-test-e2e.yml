@@ -15,3 +15,9 @@ rest-client:
   base-url: "http://localhost:${wiremock.server.port:8001}"
   categories:
     read-timeout: 300
+
+resilience4j.retry:
+  configs:
+    default:
+      maxAttempts: 2
+      waitDuration: 100

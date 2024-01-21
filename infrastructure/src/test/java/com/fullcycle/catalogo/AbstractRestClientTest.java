@@ -3,6 +3,8 @@ package com.fullcycle.catalogo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fullcycle.catalogo.infrastructure.configuration.WebServerConfig;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -24,6 +26,12 @@ public abstract class AbstractRestClientTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @BeforeEach
+    void before() {
+        WireMock.reset();
+        WireMock.resetAllRequests();
+    }
 
     protected String writeValueAsString(final Object obj) {
         try {
