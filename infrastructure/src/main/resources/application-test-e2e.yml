@@ -7,8 +7,10 @@ elasticsearch:
   password: elastic
 
 keycloak:
-  realm: test
+  client-id: fc3-app
+  client-secret: seecret
   host: http://test:8443
+  realm: test
 
 logging:
   level:

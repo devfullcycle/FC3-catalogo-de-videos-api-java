@@ -7,8 +7,10 @@ graphql:
   graphiql: true
 
 keycloak:
-  realm: ${KEYCLOAK_REALM:fc3-codeflix}
+  client-id: ${KEYCLOAK_CLIENT_ID}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET}
   host: ${KEYCLOAK_HOST:http://localhost:8443}
+  realm: ${KEYCLOAK_REALM:fc3-codeflix}
 
 server:
   port: 8080

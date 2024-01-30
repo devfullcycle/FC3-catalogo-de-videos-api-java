@@ -23,9 +23,14 @@ kafka:
       topics: adm_videos_mysql.adm_videos.categories
       group-id: catalogo-service
 
+keycloak:
+  token-uri: /protocol/openid-connect/token
+
 rest-client:
   categories:
     base-url: "${rest-client.base-url}/api/categories"
+  keycloak:
+    base-url: "${keycloak.host}/realms/${keycloak.realm}"
 
 server:
   port: 8080

@@ -4,5 +4,7 @@ elasticsearch:
   password: ${ELASTICSEARCH_PASSWORD}
 
 keycloak:
-  realm: ${KEYCLOAK_REALM}
+  client-id: ${KEYCLOAK_CLIENT_ID}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET}
   host: ${KEYCLOAK_HOST}
+  realm: ${KEYCLOAK_REALM}
