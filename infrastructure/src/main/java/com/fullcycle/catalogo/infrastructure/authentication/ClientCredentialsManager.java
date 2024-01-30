@@ -44,7 +44,7 @@ public class ClientCredentialsManager implements GetClientCredentials, RefreshCl
 
     private AuthenticationGateway.AuthenticationResult refreshToken() {
         try {
-            return this.authenticationGateway.refresh(new RefreshTokenInput(clientId(), this.credentials.refreshToken()));
+            return this.authenticationGateway.refresh(new RefreshTokenInput(clientId(), clientSecret(), this.credentials.refreshToken()));
         } catch (RuntimeException ex) {
             return this.login();
         }

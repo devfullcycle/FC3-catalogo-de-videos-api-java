@@ -9,7 +9,7 @@ elasticsearch:
 keycloak:
   client-id: fc3-app
   client-secret: seecret
-  host: http://test:8443
+  host: "http://localhost:${wiremock.server.port:8001}"
   realm: test
 
 logging:
@@ -19,6 +19,8 @@ logging:
 rest-client:
   base-url: "http://localhost:${wiremock.server.port:8001}"
   categories:
+    read-timeout: 300
+  keycloak:
     read-timeout: 300
 
 resilience4j.bulkhead:

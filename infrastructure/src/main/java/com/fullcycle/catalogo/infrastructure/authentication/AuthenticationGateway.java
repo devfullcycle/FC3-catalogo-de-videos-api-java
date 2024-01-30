@@ -12,6 +12,6 @@ public interface AuthenticationGateway {
     record ClientCredentialsInput(String clientId, String clientSecret) {
     }
 
-    record RefreshTokenInput(String clientId, String refreshToken) {
+    record RefreshTokenInput(String clientId, String clientSecret, String refreshToken) {
     }
 }

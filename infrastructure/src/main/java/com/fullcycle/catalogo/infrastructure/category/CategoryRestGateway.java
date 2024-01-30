@@ -3,6 +3,7 @@ package com.fullcycle.catalogo.infrastructure.category;
 import com.fullcycle.catalogo.domain.category.Category;
 import com.fullcycle.catalogo.infrastructure.authentication.GetClientCredentials;
 import com.fullcycle.catalogo.infrastructure.category.models.CategoryDTO;
+import com.fullcycle.catalogo.infrastructure.configuration.annotations.Categories;
 import com.fullcycle.catalogo.infrastructure.utils.HttpClient;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -25,7 +26,7 @@ public class CategoryRestGateway implements CategoryGateway, HttpClient {
     private final RestClient restClient;
     private final GetClientCredentials getClientCredentials;
 
-    public CategoryRestGateway(final RestClient categoryHttpClient, final GetClientCredentials getClientCredentials) {
+    public CategoryRestGateway(@Categories final RestClient categoryHttpClient, final GetClientCredentials getClientCredentials) {
         this.restClient = Objects.requireNonNull(categoryHttpClient);
         this.getClientCredentials = Objects.requireNonNull(getClientCredentials);
     }

@@ -8,3 +8,7 @@ keycloak:
   client-secret: ${KEYCLOAK_CLIENT_SECRET}
   host: ${KEYCLOAK_HOST}
   realm: ${KEYCLOAK_REALM}
+
+rest-client:
+  keycloak:
+    read-timeout: 1_000
