@@ -6,42 +6,28 @@ import com.fullcycle.catalogo.domain.castmember.CastMemberSearchQuery;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class CastMemberInMemoryGateway implements CastMemberGateway {
-
-    private final Map<String, CastMember> db;
-
-    public CastMemberInMemoryGateway() {
-        this.db = new ConcurrentHashMap<>();
-    }
+public class CastMemberElasticsearchGateway implements CastMemberGateway {
 
     @Override
     public CastMember save(CastMember aMember) {
-        this.db.put(aMember.id(), aMember);
-        return aMember;
+        return null;
     }
 
     @Override
     public void deleteById(String anId) {
-        this.db.remove(anId);
+
     }
 
     @Override
     public Optional<CastMember> findById(String anId) {
-        return Optional.ofNullable(this.db.get(anId));
+        return Optional.empty();
     }
 
     @Override
     public Pagination<CastMember> findAll(CastMemberSearchQuery aQuery) {
-        return new Pagination<>(
-                aQuery.page(),
-                aQuery.perPage(),
-                this.db.size(),
-                this.db.values().stream().toList()
-        );
+        return null;
     }
 }
