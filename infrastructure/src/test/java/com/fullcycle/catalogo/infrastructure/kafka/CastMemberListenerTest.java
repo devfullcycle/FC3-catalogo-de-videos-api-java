@@ -114,4 +114,80 @@ class CastMemberListenerTest extends AbstractEmbeddedKafkaTest {
 
         Assertions.assertEquals(expectedDLTTopic, metadata.getValue().topic());
     }
+
+    @Test
+    public void givenUpdateOperationWhenProcessGoesOKShouldEndTheOperation() throws Exception {
+        // given
+        final var gabriel = Fixture.CastMembers.gabriel();
+        final var gabrielEvent = CastMemberEvent.from(gabriel);
+
+        final var message =
+                Json.writeValueAsString(new MessageValue<>(new ValuePayload<>(gabrielEvent, gabrielEvent, aSource(), Operation.UPDATE)));
+
+        final var latch = new CountDownLatch(1);
+
+        doAnswer(t -> {
+            latch.countDown();
+            return gabriel;
+        }).when(saveCastMemberUseCase).execute(any());
+
+        // when
+        producer().send(new ProducerRecord<>(castmemberTopics, message)).get(10, TimeUnit.SECONDS);
+
+        Assertions.assertTrue(latch.await(1, TimeUnit.MINUTES));
+
+        // then
+        verify(saveCastMemberUseCase, times(1)).execute(refEq(gabriel, "createdAt", "updatedAt"));
+    }
+
+    @Test
+    public void givenCreateOperationWhenProcessGoesOKShouldEndTheOperation() throws Exception {
+        // given
+        final var gabriel = Fixture.CastMembers.gabriel();
+        final var gabrielEvent = CastMemberEvent.from(gabriel);
+
+        final var message =
+                Json.writeValueAsString(new MessageValue<>(new ValuePayload<>(gabrielEvent, gabrielEvent, aSource(), Operation.CREATE)));
+
+        final var latch = new CountDownLatch(1);
+
+        doAnswer(t -> {
+            latch.countDown();
+            return gabriel;
+        }).when(saveCastMemberUseCase).execute(any());
+
+        // when
+        producer().send(new ProducerRecord<>(castmemberTopics, message)).get(10, TimeUnit.SECONDS);
+
+        Assertions.assertTrue(latch.await(1, TimeUnit.MINUTES));
+
+        // then
+        verify(saveCastMemberUseCase, times(1)).execute(refEq(gabriel, "createdAt", "updatedAt"));
+    }
+
+    @Test
+    public void givenDeleteOperationWhenProcessGoesOKShouldEndTheOperation() throws Exception {
+        // given
+        final var gabriel = Fixture.CastMembers.gabriel();
+        final var gabrielEvent = CastMemberEvent.from(gabriel);
+
+        final var message =
+                Json.writeValueAsString(new MessageValue<>(new ValuePayload<>(gabrielEvent, gabrielEvent, aSource(), Operation.DELETE)));
+
+        final var latch = new CountDownLatch(1);
+
+        doAnswer(t -> {
+            latch.countDown();
+            return null;
+        }).when(deleteCastMemberUseCase).execute(any());
+
+        // when
+        producer().send(new ProducerRecord<>(castmemberTopics, message)).get(10, TimeUnit.SECONDS);
+
+        Assertions.assertTrue(latch.await(1, TimeUnit.MINUTES));
+
+        // then
+        verify(deleteCastMemberUseCase, times(1)).execute(eq(gabriel.id()));
+    }
+
 }
