@@ -9,10 +9,11 @@ graphql:
 keycloak:
   client-id: ${KEYCLOAK_CLIENT_ID}
   client-secret: ${KEYCLOAK_CLIENT_SECRET}
-  host: ${KEYCLOAK_HOST:http://localhost:8443}
+  host: ${KEYCLOAK_HOST:http://keycloak.internal:8443}
   realm: ${KEYCLOAK_REALM:fc3-codeflix}
 
 rest-client:
+  base-url: http://localhost:8080
   keycloak:
     read-timeout: 1_000
 
