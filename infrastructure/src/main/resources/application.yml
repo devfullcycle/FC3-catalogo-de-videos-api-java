@@ -1,3 +1,9 @@
+cache:
+  type: cache2k
+  names: admin-categories
+  max-entries: 200
+  ttl: 60 # seconds
+
 elasticsearch:
   connect-timeout: 250
   socket-timeout: 1_000
@@ -17,6 +23,17 @@ kafka:
       topics: adm_videos_mysql.adm_videos.categories
       group-id: catalogo-service
 
+keycloak:
+  token-uri: /protocol/openid-connect/token
+
+rest-client:
+  categories:
+    base-url: "${rest-client.base-url}/api/categories"
+    read-timeout: 1_000
+  keycloak:
+    base-url: "${keycloak.host}/realms/${keycloak.realm}"
+    read-timeout: 1_000
+
 server:
   port: 8080
   servlet:
@@ -31,6 +48,9 @@ server:
       io: 4 # One IO thread per CPU core is a reasonable default: https://undertow.io/undertow-docs/undertow-docs-2.1.0/index.html#listeners-2
 
 spring:
+  cache:
+    cache-names: ${cache.names}
+    type: ${cache.type}
   elasticsearch:
     uris: ${elasticsearch.uris}
     username: ${elasticsearch.username}
@@ -50,3 +70,56 @@ spring:
         jwt:
           jwk-set-uri: ${keycloak.host}/realms/${keycloak.realm}/protocol/openid-connect/certs
           issuer-uri: ${keycloak.host}/realms/${keycloak.realm}
+
+resilience4j.bulkhead:
+  configs:
+    default:
+      maxConcurrentCalls: 25
+      maxWaitDuration: 100
+    instances:
+      categories:
+        baseConfig: default
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      registerHealthIndicator: true
+      slidingWindowType: COUNT_BASED
+      slidingWindowSize: 100
+      minimumNumberOfCalls: 20
+      permittedNumberOfCallsInHalfOpenState: 10
+      waitDurationInOpenState: 30s
+      failureRateThreshold: 50
+      slowCallRateThreshold: 70
+      slowCallDurationThreshold: 2_000
+      recordExceptions:
+        - com.fullcycle.catalogo.domain.exceptions.InternalErrorException
+        - org.springframework.web.client.ResourceAccessException
+        - org.springframework.web.client.HttpServerErrorException.InternalServerError
+        - org.springframework.web.client.HttpServerErrorException.GatewayTimeout
+        - org.springframework.web.client.HttpServerErrorException.ServiceUnavailable
+        - java.net.SocketTimeoutException
+        - java.net.http.HttpConnectTimeoutException
+        - java.net.http.HttpTimeoutException
+        - java.util.concurrent.TimeoutException
+        - java.io.IOException
+
+resilience4j.retry:
+  configs:
+    default:
+      maxAttempts: 3
+      waitDuration: 250
+      retryExceptions:
+        - com.fullcycle.catalogo.domain.exceptions.InternalErrorException
+        - org.springframework.web.client.ResourceAccessException
+        - org.springframework.web.client.HttpServerErrorException.InternalServerError
+        - org.springframework.web.client.HttpServerErrorException.GatewayTimeout
+        - org.springframework.web.client.HttpServerErrorException.ServiceUnavailable
+        - java.net.SocketTimeoutException
+        - java.net.http.HttpConnectTimeoutException
+        - java.net.http.HttpTimeoutException
+        - java.util.concurrent.TimeoutException
+        - java.io.IOException
+  instances:
+    categories:
+      baseConfig: default
