@@ -2,11 +2,17 @@ package com.fullcycle.catalogo.infrastructure.castmember;
 
 import com.fullcycle.catalogo.AbstractElasticsearchTest;
 import com.fullcycle.catalogo.domain.Fixture;
+import com.fullcycle.catalogo.domain.castmember.CastMemberSearchQuery;
+import com.fullcycle.catalogo.domain.category.CategorySearchQuery;
 import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberDocument;
 import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberRepository;
+import com.fullcycle.catalogo.infrastructure.category.persistence.CategoryDocument;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 
 class CastMemberElasticsearchGatewayTest extends AbstractElasticsearchTest {
 
@@ -98,5 +104,140 @@ class CastMemberElasticsearchGatewayTest extends AbstractElasticsearchTest {
 
         // then
         Assertions.assertTrue(actualOutput.isEmpty());
+    }
+
+    @Test
+    public void givenEmptyCastMembers_whenCallsFindAll_shouldReturnEmptyList() {
+        // given
+        final var expectedPage = 0;
+        final var expectedPerPage = 10;
+        final var expectedTerms = "";
+        final var expectedSort = "name";
+        final var expectedDirection = "asc";
+        final var expectedTotal = 0;
+
+        final var aQuery =
+                new CastMemberSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection);
+
+        // when
+        final var actualOutput = this.castMemberGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedTotal, actualOutput.data().size());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "gab,0,10,1,1,Gabriel FullCycle",
+            "leo,0,10,1,1,Leonan FullCycle"
+    })
+    public void givenValidTerm_whenCallsFindAll_shouldReturnElementsFiltered(
+            final String expectedTerms,
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedName
+    ) {
+        // given
+        mockCastMembers();
+
+        final var expectedSort = "name";
+        final var expectedDirection = "asc";
+
+        final var aQuery =
+                new CastMemberSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection);
+
+        // when
+        final var actualOutput = this.castMemberGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+        Assertions.assertEquals(expectedName, actualOutput.data().get(0).name());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "name,asc,0,10,3,3,Gabriel FullCycle",
+            "name,desc,0,10,3,3,Wesley FullCycle",
+            "created_at,asc,0,10,3,3,Gabriel FullCycle",
+            "created_at,desc,0,10,3,3,Leonan FullCycle",
+    })
+    public void givenValidSortAndDirection_whenCallsFindAll_shouldReturnElementsSorted(
+            final String expectedSort,
+            final String expectedDirection,
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedName
+    ) {
+        // given
+        mockCastMembers();
+
+        final var expectedTerms = "";
+
+        final var aQuery =
+                new CastMemberSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection);
+
+        // when
+        final var actualOutput = this.castMemberGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+        Assertions.assertEquals(expectedName, actualOutput.data().get(0).name());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "0,1,1,3,Gabriel FullCycle",
+            "1,1,1,3,Leonan FullCycle",
+            "2,1,1,3,Wesley FullCycle",
+            "3,1,0,3,",
+    })
+    public void givenValidPage_whenCallsFindAll_shouldReturnElementsPaged(
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedName
+    ) {
+        // given
+        mockCastMembers();
+
+        final var expectedTerms = "";
+        final var expectedSort = "name";
+        final var expectedDirection = "asc";
+
+        final var aQuery =
+                new CastMemberSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection);
+
+        // when
+        final var actualOutput = this.castMemberGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+
+        if (StringUtils.isNotEmpty(expectedName)) {
+            Assertions.assertEquals(expectedName, actualOutput.data().get(0).name());
+        }
+    }
+
+    private void mockCastMembers() {
+        this.castMemberRepository.save(CastMemberDocument.from(Fixture.CastMembers.gabriel()));
+        this.castMemberRepository.save(CastMemberDocument.from(Fixture.CastMembers.wesley()));
+        this.castMemberRepository.save(CastMemberDocument.from(Fixture.CastMembers.leonan()));
     }
 }
