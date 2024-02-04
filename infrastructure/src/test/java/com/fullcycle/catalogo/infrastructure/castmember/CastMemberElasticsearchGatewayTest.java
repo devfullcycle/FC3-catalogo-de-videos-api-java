@@ -4,7 +4,6 @@ import com.fullcycle.catalogo.AbstractElasticsearchTest;
 import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberDocument;
 import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberRepository;
-import com.fullcycle.catalogo.infrastructure.category.persistence.CategoryDocument;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,5 +65,38 @@ class CastMemberElasticsearchGatewayTest extends AbstractElasticsearchTest {
 
         // when/then
         Assertions.assertDoesNotThrow(() -> this.castMemberGateway.deleteById(expectedId));
+    }
+
+    @Test
+    public void givenValidId_whenCallsFindById_shouldRetrieveIt() {
+        // given
+        final var wesley = Fixture.CastMembers.wesley();
+
+        this.castMemberRepository.save(CastMemberDocument.from(wesley));
+
+        final var expectedId = wesley.id();
+        Assertions.assertTrue(this.castMemberRepository.existsById(expectedId));
+
+        // when
+        final var actualOutput = this.castMemberGateway.findById(expectedId).get();
+
+        // then
+        Assertions.assertEquals(wesley.id(), actualOutput.id());
+        Assertions.assertEquals(wesley.name(), actualOutput.name());
+        Assertions.assertEquals(wesley.type(), actualOutput.type());
+        Assertions.assertEquals(wesley.createdAt(), actualOutput.createdAt());
+        Assertions.assertEquals(wesley.updatedAt(), actualOutput.updatedAt());
+    }
+
+    @Test
+    public void givenInvalidId_whenCallsFindById_shouldReturnEmpty() {
+        // given
+        final var expectedId = "any";
+
+        // when
+        final var actualOutput = this.castMemberGateway.findById(expectedId);
+
+        // then
+        Assertions.assertTrue(actualOutput.isEmpty());
     }
 }
