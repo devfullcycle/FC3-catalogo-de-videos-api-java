@@ -1,5 +1,7 @@
 package com.fullcycle.catalogo.domain;
 
+import com.fullcycle.catalogo.domain.castmember.CastMember;
+import com.fullcycle.catalogo.domain.castmember.CastMemberType;
 import com.fullcycle.catalogo.domain.category.Category;
 import com.fullcycle.catalogo.domain.utils.InstantUtils;
 import net.datafaker.Faker;
@@ -76,4 +78,26 @@ public final class Fixture {
             );
         }
     }
+
+    public static final class CastMembers {
+
+        private static final CastMember WESLEY =
+                CastMember.with(UUID.randomUUID().toString(), "Wesley FullCycle", CastMemberType.ACTOR, InstantUtils.now(), InstantUtils.now());
+
+        private static final CastMember GABRIEL =
+                CastMember.with(UUID.randomUUID().toString(), "Gabriel FullCycle", CastMemberType.ACTOR, InstantUtils.now(), InstantUtils.now());
+
+        public static CastMemberType type() {
+            return FAKER.options().option(CastMemberType.values());
+        }
+
+        public static CastMember wesley() {
+            return CastMember.with(WESLEY);
+        }
+
+        public static CastMember gabriel() {
+            return CastMember.with(GABRIEL);
+        }
+    }
+
 }
