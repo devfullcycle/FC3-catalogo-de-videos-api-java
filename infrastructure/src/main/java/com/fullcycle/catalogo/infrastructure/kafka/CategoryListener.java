@@ -54,7 +54,7 @@ public class CategoryListener {
     )
     @RetryableTopic(
             backoff = @Backoff(delay = 1000, multiplier = 2),
-            attempts = "4",
+            attempts = "${kafka.consumers.categories.max-attempts}",
             topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE
     )
     public void onMessage(@Payload final String payload, final ConsumerRecordMetadata metadata) {
