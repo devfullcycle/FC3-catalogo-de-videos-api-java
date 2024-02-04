@@ -1,0 +1,31 @@
+extend type Query {
+    castMembers(
+        search: String = "",
+        page: Int = 0,
+        perPage: Int = 10,
+        sort: String = "name",
+        direction: String = "asc"
+    ): [CastMember]!
+}
+
+extend type Mutation {
+    saveCastMember(input: CastMemberInput!): CastMember!
+}
+
+""" A CastMember """
+type CastMember {
+    id: ID!
+    name: String!
+    type: String!
+    createdAt: String!
+    updatedAt: String!
+}
+
+""" A input to persist a CastMember """
+input CastMemberInput {
+    id: ID!
+    name: String!
+    type: String!
+    createdAt: String!
+    updatedAt: String!
+}
