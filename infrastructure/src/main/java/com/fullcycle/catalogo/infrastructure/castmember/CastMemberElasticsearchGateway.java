@@ -4,16 +4,26 @@ import com.fullcycle.catalogo.domain.castmember.CastMember;
 import com.fullcycle.catalogo.domain.castmember.CastMemberGateway;
 import com.fullcycle.catalogo.domain.castmember.CastMemberSearchQuery;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
+import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberDocument;
+import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
 public class CastMemberElasticsearchGateway implements CastMemberGateway {
 
+    private final CastMemberRepository castMemberRepository;
+
+    public CastMemberElasticsearchGateway(final CastMemberRepository castMemberRepository) {
+        this.castMemberRepository = Objects.requireNonNull(castMemberRepository);
+    }
+
     @Override
-    public CastMember save(CastMember aMember) {
-        return null;
+    public CastMember save(final CastMember aMember) {
+        this.castMemberRepository.save(CastMemberDocument.from(aMember));
+        return aMember;
     }
 
     @Override
