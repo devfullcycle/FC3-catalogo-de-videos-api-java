@@ -2,16 +2,22 @@ package com.fullcycle.catalogo.infrastructure.graphql;
 
 import com.fullcycle.catalogo.GraphQLControllerTest;
 import com.fullcycle.catalogo.application.genre.list.ListGenreUseCase;
+import com.fullcycle.catalogo.application.genre.save.SaveGenreUseCase;
 import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
+import com.fullcycle.catalogo.domain.utils.IdUtils;
+import com.fullcycle.catalogo.domain.utils.InstantUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.graphql.test.tester.GraphQlTester;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -20,8 +26,14 @@ import static org.mockito.Mockito.*;
 @GraphQLControllerTest(controllers = GenreGraphQLController.class)
 public class GenreGraphQLControllerTest {
 
+    private static final ParameterizedTypeReference<Set<String>> CATEGORIES_TYPE = new ParameterizedTypeReference<>() {
+    };
+
     @MockBean
     private ListGenreUseCase listGenreUseCase;
+
+    @MockBean
+    private SaveGenreUseCase saveGenreUseCase;
 
     @Autowired
     private GraphQlTester graphql;
@@ -148,5 +160,61 @@ public class GenreGraphQLControllerTest {
         Assertions.assertEquals(expectedDirection, actualQuery.direction());
         Assertions.assertEquals(expectedSearch, actualQuery.terms());
         Assertions.assertEquals(expectedCategories, actualQuery.categories());
+    }
+
+    @Test
+    public void givenGenreInput_whenCallsSaveGenreMutation_shouldPersistAndReturn() {
+        // given
+        final var expectedId = IdUtils.uniqueId();
+        final var expectedName = "Business";
+        final var expectedIsActive = true;
+        final var expectedCategories = Set.of("c1", "c2");
+        final var expectedDates = InstantUtils.now();
+
+        final var input = Map.of(
+                "id", expectedId,
+                "name", expectedName,
+                "active", String.valueOf(expectedIsActive),
+                "categories", "[%s]".formatted(String.join(",", expectedCategories)),
+                "createdAt", expectedDates.toString(),
+                "updatedAt", expectedDates.toString(),
+                "deletedAt", expectedDates.toString()
+        );
+
+        final var query = """
+                mutation SaveGenre($input: GenreInput!) {
+                    genre: saveGenre(input: $input) {
+                        id
+                    }
+                }
+                """;
+
+        doReturn(new SaveGenreUseCase.Output(expectedId)).when(saveGenreUseCase).execute(any());
+
+        // when
+        this.graphql.document(query)
+                .variable("input", input)
+                .execute()
+                .path("genre.id").entity(String.class).isEqualTo(expectedId)
+                .path("genre.name").entity(String.class).isEqualTo(expectedName)
+                .path("genre.active").entity(Boolean.class).isEqualTo(expectedIsActive)
+                .path("genre.categories").entity(CATEGORIES_TYPE).isEqualTo(expectedCategories)
+                .path("genre.createdAt").entity(Instant.class).isEqualTo(expectedDates)
+                .path("genre.updatedAt").entity(Instant.class).isEqualTo(expectedDates)
+                .path("genre.deletedAt").entity(Instant.class).isEqualTo(expectedDates);
+
+        // then
+        final var capturer = ArgumentCaptor.forClass(SaveGenreUseCase.Input.class);
+
+        verify(this.saveGenreUseCase, times(1)).execute(capturer.capture());
+
+        final var actualGenre = capturer.getValue();
+        Assertions.assertEquals(expectedId, actualGenre.id());
+        Assertions.assertEquals(expectedName, actualGenre.name());
+        Assertions.assertEquals(expectedIsActive, actualGenre.active());
+        Assertions.assertEquals(expectedCategories, actualGenre.categories());
+        Assertions.assertEquals(expectedDates, actualGenre.createdAt());
+        Assertions.assertEquals(expectedDates, actualGenre.updatedAt());
+        Assertions.assertEquals(expectedDates, actualGenre.deletedAt());
     }
 }

@@ -10,7 +10,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    saveGenre(input: GenreInput!): Genre!
+    saveGenre(input: GenreInput!): NewGenre!
 }
 
 """ A Genre """
@@ -22,6 +22,11 @@ type Genre {
     createdAt: String!
     updatedAt: String!
     deletedAt: String!
+}
+
+""" A Genre """
+type NewGenre {
+    id: ID!
 }
 
 """ A input to persist a Genre """
