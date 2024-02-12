@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.graphql.test.tester.GraphQlTester;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -38,6 +39,7 @@ public class GenreGraphQLControllerTest {
         final var expectedSort = "name";
         final var expectedDirection = "asc";
         final var expectedSearch = "";
+        final var expectedCategories = Set.of();
 
         when(this.listGenreUseCase.execute(any()))
                 .thenReturn(new Pagination<>(expectedPage, expectedPerPage, expectedGenres.size(), expectedGenres));
@@ -47,6 +49,7 @@ public class GenreGraphQLControllerTest {
                   genres {
                     id
                     name
+                    active
                     categories
                     createdAt
                     updatedAt
@@ -78,6 +81,7 @@ public class GenreGraphQLControllerTest {
         Assertions.assertEquals(expectedSort, actualQuery.sort());
         Assertions.assertEquals(expectedDirection, actualQuery.direction());
         Assertions.assertEquals(expectedSearch, actualQuery.terms());
+        Assertions.assertEquals(expectedCategories, actualQuery.categories());
     }
 
     @Test
@@ -93,14 +97,15 @@ public class GenreGraphQLControllerTest {
         final var expectedSort = "id";
         final var expectedDirection = "desc";
         final var expectedSearch = "asd";
+        final var expectedCategories = Set.of("c1");
 
         when(this.listGenreUseCase.execute(any()))
                 .thenReturn(new Pagination<>(expectedPage, expectedPerPage, expectedGenres.size(), expectedGenres));
 
         final var query = """
-                query AllGenres($search: String, $page: Int, $perPage: Int, $sort: String, $direction: String) {
+                query AllGenres($search: String, $page: Int, $perPage: Int, $sort: String, $direction: String, $categories: [String]) {
                                 
-                  genres(search: $search, page: $page, perPage: $perPage, sort: $sort, direction: $direction) {
+                  genres(search: $search, page: $page, perPage: $perPage, sort: $sort, direction: $direction, categories: $categories) {
                     id
                     name
                     active
@@ -119,6 +124,7 @@ public class GenreGraphQLControllerTest {
                 .variable("perPage", expectedPerPage)
                 .variable("sort", expectedSort)
                 .variable("direction", expectedDirection)
+                .variable("categories", expectedCategories)
                 .execute();
 
         final var actualGenres = res.path("genres")
@@ -141,5 +147,6 @@ public class GenreGraphQLControllerTest {
         Assertions.assertEquals(expectedSort, actualQuery.sort());
         Assertions.assertEquals(expectedDirection, actualQuery.direction());
         Assertions.assertEquals(expectedSearch, actualQuery.terms());
+        Assertions.assertEquals(expectedCategories, actualQuery.categories());
     }
 }
