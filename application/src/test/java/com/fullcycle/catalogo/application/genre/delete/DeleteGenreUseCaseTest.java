@@ -29,10 +29,22 @@ public class DeleteGenreUseCaseTest extends UseCaseTest {
                 .when(this.genreGateway).deleteById(anyString());
 
         // when
-        Assertions.assertDoesNotThrow(() -> this.useCase.execute(expectedId));
+        Assertions.assertDoesNotThrow(() -> this.useCase.execute(new DeleteGenreUseCase.Input(expectedId)));
 
         // then
         verify(this.genreGateway, times(1)).deleteById(eq(expectedId));
+    }
+
+    @Test
+    public void givenNullInput_whenCallsDelete_shouldBeOk() {
+        // given
+        final DeleteGenreUseCase.Input input = null;
+
+        // when
+        Assertions.assertDoesNotThrow(() -> this.useCase.execute(input));
+
+        // then
+        verify(this.genreGateway, never()).deleteById(any());
     }
 
     @Test
@@ -41,9 +53,9 @@ public class DeleteGenreUseCaseTest extends UseCaseTest {
         final String expectedId = null;
 
         // when
-        Assertions.assertDoesNotThrow(() -> this.useCase.execute(expectedId));
+        Assertions.assertDoesNotThrow(() -> this.useCase.execute(new DeleteGenreUseCase.Input(expectedId)));
 
         // then
-        verify(this.genreGateway, never()).deleteById(eq(expectedId));
+        verify(this.genreGateway, never()).deleteById(any());
     }
 }
