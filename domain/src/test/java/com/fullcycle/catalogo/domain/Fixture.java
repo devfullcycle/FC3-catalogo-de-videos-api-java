@@ -8,6 +8,7 @@ import com.fullcycle.catalogo.domain.utils.IdUtils;
 import net.datafaker.Faker;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.UUID;
 
 import static com.fullcycle.catalogo.domain.utils.InstantUtils.now;
@@ -105,11 +106,11 @@ public final class Fixture {
     public static final class Genres {
 
         public static Genre tech() {
-            return Genre.with(IdUtils.uniqueId(), "Technology", true, new ArrayList<>(), now(), now(), now());
+            return Genre.with(IdUtils.uniqueId(), "Technology", true, new HashSet<>(), now(), now(), now());
         }
 
         public static Genre business() {
-            return Genre.with(IdUtils.uniqueId(), "Business", true, new ArrayList<>(), now(), now(), now());
+            return Genre.with(IdUtils.uniqueId(), "Business", true, new HashSet<>(), now(), now(), now());
         }
     }
 }
