@@ -1,12 +1,13 @@
 package com.fullcycle.catalogo.application.genre.save;
 
 import com.fullcycle.catalogo.application.UseCaseTest;
-import com.fullcycle.catalogo.domain.category.Category;
 import com.fullcycle.catalogo.domain.exceptions.DomainException;
+import com.fullcycle.catalogo.domain.genre.Genre;
 import com.fullcycle.catalogo.domain.genre.GenreGateway;
 import com.fullcycle.catalogo.domain.utils.InstantUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -46,10 +47,22 @@ public class SaveGenreUseCaseTest extends UseCaseTest {
         final var actualOutput = this.useCase.execute(input);
 
         // then
-        verify(genreGateway, times(1)).save(eq(aCategory));
-
         Assertions.assertNotNull(actualOutput);
         Assertions.assertEquals(expectedID, actualOutput.id());
+
+        var captor = ArgumentCaptor.forClass(Genre.class);
+
+        verify(genreGateway, times(1)).save(captor.capture());
+
+        var actualGenre = captor.getValue();
+        Assertions.assertNotNull(actualGenre);
+        Assertions.assertEquals(expectedID, actualGenre.id());
+        Assertions.assertEquals(expectedName, actualGenre.name());
+        Assertions.assertEquals(expectedCategories, actualGenre.categories());
+        Assertions.assertEquals(expectedIsActive, actualGenre.active());
+        Assertions.assertEquals(expectedDates, actualGenre.createdAt());
+        Assertions.assertEquals(expectedDates, actualGenre.updatedAt());
+        Assertions.assertEquals(expectedDates, actualGenre.deletedAt());
     }
 
     @Test
