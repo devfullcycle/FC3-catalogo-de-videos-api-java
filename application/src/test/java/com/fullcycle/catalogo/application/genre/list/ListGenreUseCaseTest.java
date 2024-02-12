@@ -35,7 +35,7 @@ public class ListGenreUseCaseTest extends UseCaseTest {
         );
 
         final var expectedItems = genres.stream()
-                .map(ListGenreOutput::from)
+                .map(ListGenreUseCase.Output::from)
                 .toList();
 
         final var expectedPage = 0;
@@ -47,7 +47,7 @@ public class ListGenreUseCaseTest extends UseCaseTest {
         final var expectedCategories = Set.of("c1");
 
         final var aQuery =
-                new GenreSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection, expectedCategories);
+                new ListGenreUseCase.Input(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection, expectedCategories);
 
         final var pagination =
                 new Pagination<>(expectedPage, expectedPerPage, genres.size(), genres);
