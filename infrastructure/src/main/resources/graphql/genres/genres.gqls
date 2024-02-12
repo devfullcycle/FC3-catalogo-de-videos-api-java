@@ -21,7 +21,7 @@ type Genre {
     categories: [String]!
     createdAt: String!
     updatedAt: String!
-    deletedAt: String!
+    deletedAt: String
 }
 
 """ A Genre """
@@ -37,5 +37,5 @@ input GenreInput {
     categories: [String]!
     createdAt: String!
     updatedAt: String!
-    deletedAt: String!
+    deletedAt: String
 }
