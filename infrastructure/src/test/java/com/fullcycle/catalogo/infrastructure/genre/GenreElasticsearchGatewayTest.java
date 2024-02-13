@@ -3,13 +3,16 @@ package com.fullcycle.catalogo.infrastructure.genre;
 import com.fullcycle.catalogo.AbstractElasticsearchTest;
 import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.genre.Genre;
+import com.fullcycle.catalogo.domain.genre.GenreSearchQuery;
 import com.fullcycle.catalogo.domain.utils.IdUtils;
-import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberDocument;
 import com.fullcycle.catalogo.infrastructure.genre.persistence.GenreDocument;
 import com.fullcycle.catalogo.infrastructure.genre.persistence.GenreRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -154,5 +157,180 @@ public class GenreElasticsearchGatewayTest extends AbstractElasticsearchTest {
 
         // then
         Assertions.assertTrue(actualOutput.isEmpty());
+    }
+
+    @Test
+    public void givenEmptyGenre_whenCallsFindAll_shouldReturnEmptyList() {
+        // given
+        final var expectedPage = 0;
+        final var expectedPerPage = 10;
+        final var expectedTerms = "";
+        final var expectedSort = "name";
+        final var expectedDirection = "asc";
+        final var expectedTotal = 0;
+        final var expectedCategories = Set.<String>of();
+
+        final var aQuery =
+                new GenreSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection, expectedCategories);
+
+        // when
+        final var actualOutput = this.genreGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedTotal, actualOutput.data().size());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "mar,0,10,1,1,Marketing",
+            "te,0,10,1,1,Technology"
+    })
+    public void givenValidTerm_whenCallsFindAll_shouldReturnElementsFiltered(
+            final String expectedTerms,
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedName
+    ) {
+        // given
+        mockGenres();
+
+        final var expectedSort = "name";
+        final var expectedDirection = "asc";
+        final var expectedCategories = Set.<String>of();
+
+        final var aQuery =
+                new GenreSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection, expectedCategories);
+
+        // when
+        final var actualOutput = this.genreGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+        Assertions.assertEquals(expectedName, actualOutput.data().get(0).name());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "c123,0,10,1,1,Marketing",
+            "c456,0,10,1,1,Technology",
+            ",0,10,3,3,Business",
+    })
+    public void givenValidCategory_whenCallsFindAll_shouldReturnElementsFiltered(
+            final String categories,
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedName
+    ) {
+        // given
+        mockGenres();
+
+        final var expectedTerms = "";
+        final var expectedSort = "name";
+        final var expectedDirection = "asc";
+        final var expectedCategories = Set.of(categories);
+
+        final var aQuery =
+                new GenreSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection, expectedCategories);
+
+        // when
+        final var actualOutput = this.genreGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+        Assertions.assertEquals(expectedName, actualOutput.data().get(0).name());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "name,asc,0,10,3,3,Business",
+            "name,desc,0,10,3,3,Technology",
+            "created_at,asc,0,10,3,3,Technology",
+            "created_at,desc,0,10,3,3,Marketing",
+    })
+    public void givenValidSortAndDirection_whenCallsFindAll_shouldReturnElementsSorted(
+            final String expectedSort,
+            final String expectedDirection,
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedName
+    ) {
+        // given
+        mockGenres();
+
+        final var expectedTerms = "";
+        final var expectedCategories = Set.<String>of();
+
+        final var aQuery =
+                new GenreSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection, expectedCategories);
+
+        // when
+        final var actualOutput = this.genreGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+        Assertions.assertEquals(expectedName, actualOutput.data().get(0).name());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "0,1,1,3,Business",
+            "1,1,1,3,Marketing",
+            "2,1,1,3,Technology",
+            "3,1,0,3,",
+    })
+    public void givenValidPage_whenCallsFindAll_shouldReturnElementsPaged(
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedName
+    ) {
+        // given
+        mockGenres();
+
+        final var expectedTerms = "";
+        final var expectedSort = "name";
+        final var expectedDirection = "asc";
+        final var expectedCategories = Set.<String>of();
+
+        final var aQuery =
+                new GenreSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection, expectedCategories);
+
+        // when
+        final var actualOutput = this.genreGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+
+        if (StringUtils.isNotEmpty(expectedName)) {
+            Assertions.assertEquals(expectedName, actualOutput.data().get(0).name());
+        }
+    }
+
+    private void mockGenres() {
+        this.genreRepository.save(GenreDocument.from(Fixture.Genres.tech()));
+        this.genreRepository.save(GenreDocument.from(Fixture.Genres.business()));
+        this.genreRepository.save(GenreDocument.from(Fixture.Genres.marketing()));
     }
 }
