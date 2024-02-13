@@ -1,7 +1,6 @@
 package com.fullcycle.catalogo.infrastructure.genre;
 
 import com.fullcycle.catalogo.AbstractElasticsearchTest;
-import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.genre.Genre;
 import com.fullcycle.catalogo.domain.utils.IdUtils;
 import com.fullcycle.catalogo.infrastructure.genre.persistence.GenreRepository;
@@ -10,10 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import static com.fullcycle.catalogo.domain.utils.InstantUtils.now;
 
-class GenreElasticsearchGatewayTest extends AbstractElasticsearchTest {
+public class GenreElasticsearchGatewayTest extends AbstractElasticsearchTest {
 
     @Autowired
     private GenreElasticsearchGateway genreGateway;
@@ -28,9 +28,9 @@ class GenreElasticsearchGatewayTest extends AbstractElasticsearchTest {
     }
 
     @Test
-    public void givenValidActiveGenre_whenCallsSave_shouldPersistIt() {
+    public void givenActiveGenreWithCategories_whenCallsSave_shouldPersistIt() {
         // given
-        final var tech = Genre.with(IdUtils.uniqueId(), "Technology", true, new HashSet<>(), now(), now(), null);
+        final var tech = Genre.with(IdUtils.uniqueId(), "Technology", true, Set.of("c1", "c2"), now(), now(), null);
 
         // when
         final var actualOutput = this.genreGateway.save(tech);
@@ -49,7 +49,7 @@ class GenreElasticsearchGatewayTest extends AbstractElasticsearchTest {
     }
 
     @Test
-    public void givenValidInactiveGenre_whenCallsSave_shouldPersistIt() {
+    public void givenInactiveGenreWithoutCategories_whenCallsSave_shouldPersistIt() {
         // given
         final var tech = Genre.with(IdUtils.uniqueId(), "Technology", false, new HashSet<>(), now(), now(), now());
 

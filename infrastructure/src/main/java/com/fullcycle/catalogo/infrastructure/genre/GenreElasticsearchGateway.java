@@ -4,6 +4,7 @@ import com.fullcycle.catalogo.domain.genre.Genre;
 import com.fullcycle.catalogo.domain.genre.GenreGateway;
 import com.fullcycle.catalogo.domain.genre.GenreSearchQuery;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
+import com.fullcycle.catalogo.infrastructure.genre.persistence.GenreDocument;
 import com.fullcycle.catalogo.infrastructure.genre.persistence.GenreRepository;
 import org.springframework.data.elasticsearch.core.SearchOperations;
 import org.springframework.stereotype.Component;
@@ -26,8 +27,9 @@ public class GenreElasticsearchGateway implements GenreGateway {
     }
 
     @Override
-    public Genre save(Genre aGenre) {
-        return null;
+    public Genre save(final Genre aGenre) {
+        this.genreRepository.save(GenreDocument.from(aGenre));
+        return aGenre;
     }
 
     @Override
