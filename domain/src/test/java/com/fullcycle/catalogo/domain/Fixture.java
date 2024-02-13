@@ -106,11 +106,11 @@ public final class Fixture {
     public static final class Genres {
 
         public static Genre tech() {
-            return Genre.with(IdUtils.uniqueId(), "Technology", true, new HashSet<>(), now(), now(), now());
+            return Genre.with(IdUtils.uniqueId(), "Technology", true, new HashSet<>(), now(), now(), null);
         }
 
         public static Genre business() {
-            return Genre.with(IdUtils.uniqueId(), "Business", true, new HashSet<>(), now(), now(), now());
+            return Genre.with(IdUtils.uniqueId(), "Business", false, new HashSet<>(), now(), now(), now());
         }
     }
 }
