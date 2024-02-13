@@ -237,7 +237,7 @@ public class GenreElasticsearchGatewayTest extends AbstractElasticsearchTest {
         final var expectedTerms = "";
         final var expectedSort = "name";
         final var expectedDirection = "asc";
-        final var expectedCategories = Set.of(categories);
+        final var expectedCategories = categories == null ? Set.<String>of() : Set.of(categories);
 
         final var aQuery =
                 new GenreSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection, expectedCategories);
