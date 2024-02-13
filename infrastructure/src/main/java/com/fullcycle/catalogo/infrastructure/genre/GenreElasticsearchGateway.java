@@ -33,8 +33,8 @@ public class GenreElasticsearchGateway implements GenreGateway {
     }
 
     @Override
-    public void deleteById(String genreId) {
-
+    public void deleteById(final String genreId) {
+        this.genreRepository.deleteById(genreId);
     }
 
     @Override

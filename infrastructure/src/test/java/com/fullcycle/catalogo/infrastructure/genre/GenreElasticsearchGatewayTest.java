@@ -1,8 +1,10 @@
 package com.fullcycle.catalogo.infrastructure.genre;
 
 import com.fullcycle.catalogo.AbstractElasticsearchTest;
+import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.genre.Genre;
 import com.fullcycle.catalogo.domain.utils.IdUtils;
+import com.fullcycle.catalogo.infrastructure.genre.persistence.GenreDocument;
 import com.fullcycle.catalogo.infrastructure.genre.persistence.GenreRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -67,5 +69,31 @@ public class GenreElasticsearchGatewayTest extends AbstractElasticsearchTest {
         Assertions.assertEquals(tech.createdAt(), actualGenre.createdAt());
         Assertions.assertEquals(tech.updatedAt(), actualGenre.updatedAt());
         Assertions.assertEquals(tech.deletedAt(), actualGenre.deletedAt());
+    }
+
+    @Test
+    public void givenValidId_whenCallsDeleteById_shouldDeleteIt() {
+        // given
+        final var tech = Fixture.Genres.tech();
+
+        this.genreRepository.save(GenreDocument.from(tech));
+
+        final var expectedId = tech.id();
+        Assertions.assertTrue(this.genreRepository.existsById(expectedId));
+
+        // when
+        this.genreGateway.deleteById(expectedId);
+
+        // then
+        Assertions.assertFalse(this.genreRepository.existsById(expectedId));
+    }
+
+    @Test
+    public void givenInvalidId_whenCallsDeleteById_shouldBeOk() {
+        // given
+        final var expectedId = "any";
+
+        // when/then
+        Assertions.assertDoesNotThrow(() -> this.genreGateway.deleteById(expectedId));
     }
 }
