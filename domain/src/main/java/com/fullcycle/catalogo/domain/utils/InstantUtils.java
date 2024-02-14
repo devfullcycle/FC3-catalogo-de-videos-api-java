@@ -16,6 +16,10 @@ public final class InstantUtils {
     }
 
     public static Instant fromTimestamp(final Long timestamp) {
+        if (timestamp == null) {
+            return null;
+        }
+
         return new Timestamp(timestamp / UNIX_PRECISION).toInstant();
     }
 }
