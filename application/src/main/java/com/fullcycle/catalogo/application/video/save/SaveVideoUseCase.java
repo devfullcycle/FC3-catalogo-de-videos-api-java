@@ -3,12 +3,9 @@ package com.fullcycle.catalogo.application.video.save;
 import com.fullcycle.catalogo.application.UseCase;
 import com.fullcycle.catalogo.domain.exceptions.DomainException;
 import com.fullcycle.catalogo.domain.validation.Error;
-import com.fullcycle.catalogo.domain.video.Rating;
 import com.fullcycle.catalogo.domain.video.Video;
 import com.fullcycle.catalogo.domain.video.VideoGateway;
 
-import java.time.Instant;
-import java.time.Year;
 import java.util.Objects;
 import java.util.Set;
 
@@ -54,13 +51,13 @@ public class SaveVideoUseCase extends UseCase<SaveVideoUseCase.Input, SaveVideoU
             String id,
             String title,
             String description,
-            Year launchedAt,
+            Integer launchedAt,
             double duration,
-            Rating rating,
+            String rating,
             boolean opened,
             boolean published,
-            Instant createdAt,
-            Instant updatedAt,
+            String createdAt,
+            String updatedAt,
             String video,
             String trailer,
             String banner,

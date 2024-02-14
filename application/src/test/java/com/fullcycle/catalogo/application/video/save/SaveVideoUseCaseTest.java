@@ -61,16 +61,17 @@ public class SaveVideoUseCaseTest extends UseCaseTest {
                 .thenAnswer(returnsFirstArg());
 
         // when
-        final var input = new SaveVideoUseCase.Input(expectedId,
+        final var input = new SaveVideoUseCase.Input(
+                expectedId,
                 expectedTitle,
                 expectedDescription,
-                expectedLaunchedAt,
+                expectedLaunchedAt.getValue(),
                 expectedDuration,
-                expectedRating,
+                expectedRating.getName(),
                 expectedOpened,
                 expectedPublished,
-                expectedCreatedAt,
-                expectedUpdatedAt,
+                expectedCreatedAt.toString(),
+                expectedUpdatedAt.toString(),
                 expectedVideo,
                 expectedTrailer,
                 expectedBanner,
@@ -161,16 +162,17 @@ public class SaveVideoUseCaseTest extends UseCaseTest {
         final var expectedErrorMessage = "'id' should not be empty";
 
         // when
-        final var input = new SaveVideoUseCase.Input(expectedId,
+        final var input = new SaveVideoUseCase.Input(
+                expectedId,
                 expectedTitle,
                 expectedDescription,
-                expectedLaunchedAt,
+                expectedLaunchedAt.getValue(),
                 expectedDuration,
-                expectedRating,
+                expectedRating.getName(),
                 expectedOpened,
                 expectedPublished,
-                expectedCreatedAt,
-                expectedUpdatedAt,
+                expectedCreatedAt.toString(),
+                expectedUpdatedAt.toString(),
                 expectedVideo,
                 expectedTrailer,
                 expectedBanner,

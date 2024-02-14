@@ -5,9 +5,11 @@ import com.fullcycle.catalogo.domain.castmember.CastMemberType;
 import com.fullcycle.catalogo.domain.category.Category;
 import com.fullcycle.catalogo.domain.genre.Genre;
 import com.fullcycle.catalogo.domain.utils.IdUtils;
+import com.fullcycle.catalogo.domain.utils.InstantUtils;
+import com.fullcycle.catalogo.domain.video.Rating;
+import com.fullcycle.catalogo.domain.video.Video;
 import net.datafaker.Faker;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -116,6 +118,59 @@ public final class Fixture {
 
         public static Genre marketing() {
             return Genre.with(IdUtils.uniqueId(), "Marketing", true, Set.of("c123"), now(), now(), null);
+        }
+    }
+
+    public static final class Videos {
+
+        public static Rating rating() {
+            return FAKER.options().option(Rating.values());
+        }
+
+        public static Video systemDesign() {
+            return Video.with(
+                    IdUtils.uniqueId(),
+                    "System Design no Mercado Livre na prática",
+                    "O vídeo mais assistido",
+                    Fixture.year(),
+                    Fixture.duration(),
+                    rating().getName(),
+                    Fixture.bool(),
+                    Fixture.bool(),
+                    InstantUtils.now().toString(),
+                    InstantUtils.now().toString(),
+                    "http://video",
+                    "http://trailer",
+                    "http://banner",
+                    "http://thumb",
+                    "http://thumbhalf",
+                    Set.of(IdUtils.uniqueId()),
+                    Set.of(IdUtils.uniqueId()),
+                    Set.of(IdUtils.uniqueId())
+            );
+        }
+
+        public static Video java21() {
+            return Video.with(
+                    IdUtils.uniqueId(),
+                    "Java 21",
+                    "O vídeo mais assistido",
+                    Fixture.year(),
+                    Fixture.duration(),
+                    rating().getName(),
+                    Fixture.bool(),
+                    Fixture.bool(),
+                    InstantUtils.now().toString(),
+                    InstantUtils.now().toString(),
+                    "http://video",
+                    "http://trailer",
+                    "http://banner",
+                    "http://thumb",
+                    "http://thumbhalf",
+                    Set.of(IdUtils.uniqueId()),
+                    Set.of(IdUtils.uniqueId()),
+                    Set.of(IdUtils.uniqueId())
+            );
         }
     }
 }

@@ -38,13 +38,13 @@ public class Video {
             final String id,
             final String title,
             final String description,
-            final Year launchedAt,
+            final Integer launchedAt,
             final double duration,
-            final Rating rating,
+            final String rating,
             final boolean opened,
             final boolean published,
-            final Instant createdAt,
-            final Instant updatedAt,
+            final String createdAt,
+            final String updatedAt,
             final String video,
             final String trailer,
             final String banner,
@@ -57,13 +57,13 @@ public class Video {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.launchedAt = launchedAt;
+        this.launchedAt = Year.of(launchedAt);
         this.duration = duration;
-        this.rating = rating;
+        this.rating = Rating.of(rating).orElse(null);
         this.opened = opened;
         this.published = published;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.createdAt = Instant.parse(createdAt);
+        this.updatedAt = Instant.parse(updatedAt);
         this.video = video;
         this.trailer = trailer;
         this.banner = banner;
@@ -100,13 +100,13 @@ public class Video {
             final String id,
             final String title,
             final String description,
-            final Year launchedAt,
+            final Integer launchedAt,
             final double duration,
-            final Rating rating,
+            final String rating,
             final boolean opened,
             final boolean published,
-            final Instant createdAt,
-            final Instant updatedAt,
+            final String createdAt,
+            final String updatedAt,
             final String video,
             final String trailer,
             final String banner,
@@ -143,13 +143,13 @@ public class Video {
                 video.id(),
                 video.title(),
                 video.description(),
-                video.launchedAt(),
+                video.launchedAt().getValue(),
                 video.duration(),
-                video.rating(),
+                video.rating().getName(),
                 video.opened(),
                 video.published(),
-                video.createdAt(),
-                video.updatedAt(),
+                video.createdAt().toString(),
+                video.updatedAt().toString(),
                 video.video(),
                 video.trailer(),
                 video.banner(),
@@ -176,6 +176,14 @@ public class Video {
 
         if (rating == null) {
             handler.append(new Error("'rating' should not be empty"));
+        }
+
+        if (createdAt == null) {
+            handler.append(new Error("'createdAt' should not be empty"));
+        }
+
+        if (updatedAt == null) {
+            handler.append(new Error("'updatedAt' should not be empty"));
         }
     }
 
