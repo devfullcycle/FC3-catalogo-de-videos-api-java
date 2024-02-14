@@ -1,0 +1,41 @@
+extend type Query {
+    genres(
+        search: String = "",
+        page: Int = 0,
+        perPage: Int = 10,
+        sort: String = "name",
+        direction: String = "asc",
+        categories: [String] = [],
+    ): [Genre]!
+}
+
+extend type Mutation {
+    saveGenre(input: GenreInput!): NewGenre!
+}
+
+""" A Genre """
+type Genre {
+    id: ID!
+    name: String!
+    active: Boolean!
+    categories: [String]!
+    createdAt: String!
+    updatedAt: String!
+    deletedAt: String
+}
+
+""" A Genre """
+type NewGenre {
+    id: ID!
+}
+
+""" A input to persist a Genre """
+input GenreInput {
+    id: ID!
+    name: String!
+    active: Boolean!
+    categories: [String]!
+    createdAt: String!
+    updatedAt: String!
+    deletedAt: String
+}
