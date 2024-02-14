@@ -4,13 +4,12 @@ import com.fullcycle.catalogo.domain.genre.Genre;
 import com.fullcycle.catalogo.domain.genre.GenreGateway;
 import com.fullcycle.catalogo.domain.genre.GenreSearchQuery;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
+//@Component
 public class GenreInMemoryGateway implements GenreGateway {
 
     private final Map<String, Genre> db;
