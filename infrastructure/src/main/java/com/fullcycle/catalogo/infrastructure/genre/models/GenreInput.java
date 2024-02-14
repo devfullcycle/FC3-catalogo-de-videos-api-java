@@ -5,17 +5,17 @@ import com.fullcycle.catalogo.domain.genre.Genre;
 import java.time.Instant;
 import java.util.Set;
 
-public record GenreDTO(
+public record GenreInput(
         String id,
         String name,
-        Boolean isActive,
-        Set<String> categoriesId,
+        Boolean active,
+        Set<String> categories,
         Instant createdAt,
         Instant updatedAt,
         Instant deletedAt
 ) {
-    public static GenreDTO from(final Genre genre) {
-        return new GenreDTO(
+    public static GenreInput from(final Genre genre) {
+        return new GenreInput(
                 genre.id(),
                 genre.name(),
                 genre.active(),

@@ -21,7 +21,7 @@ public class CategoryDocument {
     @Field(type = FieldType.Text, name = "description")
     private String description;
 
-    @Field(type = FieldType.Boolean, name = "active")
+    @Field(type = FieldType.Boolean, name = "isActive")
     private boolean active;
 
     @Field(type = FieldType.Date, name = "created_at")
