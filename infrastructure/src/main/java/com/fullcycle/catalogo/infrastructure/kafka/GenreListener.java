@@ -66,7 +66,7 @@ public class GenreListener {
             this.deleteGenreUseCase.execute(new DeleteGenreUseCase.Input(messagePayload.before().id()));
         } else {
             this.genreGateway.genreOfId(messagePayload.after().id())
-                    .map(it -> new SaveGenreUseCase.Input(it.id(), it.name(), it.active(), it.categories(), it.createdAt(), it.updatedAt(), it.deletedAt()))
+                    .map(it -> new SaveGenreUseCase.Input(it.id(), it.name(), it.isActive(), it.categoriesId(), it.createdAt(), it.updatedAt(), it.deletedAt()))
                     .ifPresentOrElse(this.saveGenreUseCase::execute, () -> {
                         LOG.warn("Genre was not found {}", messagePayload.after().id());
                     });

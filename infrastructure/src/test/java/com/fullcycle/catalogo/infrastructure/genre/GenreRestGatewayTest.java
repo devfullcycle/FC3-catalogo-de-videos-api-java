@@ -63,8 +63,8 @@ class GenreRestGatewayTest extends AbstractRestClientTest {
         // then
         Assertions.assertEquals(tech.id(), actualGenre.id());
         Assertions.assertEquals(tech.name(), actualGenre.name());
-        Assertions.assertEquals(tech.active(), actualGenre.active());
-        Assertions.assertEquals(tech.categories(), actualGenre.categories());
+        Assertions.assertEquals(tech.active(), actualGenre.isActive());
+        Assertions.assertEquals(tech.categories(), actualGenre.categoriesId());
         Assertions.assertEquals(tech.createdAt(), actualGenre.createdAt());
         Assertions.assertEquals(tech.updatedAt(), actualGenre.updatedAt());
         Assertions.assertEquals(tech.deletedAt(), actualGenre.deletedAt());
@@ -108,8 +108,8 @@ class GenreRestGatewayTest extends AbstractRestClientTest {
         // then
         Assertions.assertEquals(business.id(), actualGenre.id());
         Assertions.assertEquals(business.name(), actualGenre.name());
-        Assertions.assertEquals(business.active(), actualGenre.active());
-        Assertions.assertEquals(business.categories(), actualGenre.categories());
+        Assertions.assertEquals(business.active(), actualGenre.isActive());
+        Assertions.assertEquals(business.categories(), actualGenre.categoriesId());
         Assertions.assertEquals(business.createdAt(), actualGenre.createdAt());
         Assertions.assertEquals(business.updatedAt(), actualGenre.updatedAt());
         Assertions.assertEquals(business.deletedAt(), actualGenre.deletedAt());
