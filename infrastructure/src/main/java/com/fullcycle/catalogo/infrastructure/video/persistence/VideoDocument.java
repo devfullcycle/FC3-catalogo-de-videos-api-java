@@ -58,14 +58,14 @@ public class VideoDocument {
     @Field(type = FieldType.Keyword, name = "thumbnailHalf")
     private String thumbnailHalf;
 
-    @Field(type = FieldType.Keyword, name = "categories_id")
-    private Set<String> categoriesId;
+    @Field(type = FieldType.Keyword, name = "categories")
+    private Set<String> categories;
 
-    @Field(type = FieldType.Keyword, name = "cast_members_id")
-    private Set<String> castMembersId;
+    @Field(type = FieldType.Keyword, name = "cast_members")
+    private Set<String> castMembers;
 
-    @Field(type = FieldType.Keyword, name = "genres_id")
-    private Set<String> genresId;
+    @Field(type = FieldType.Keyword, name = "genres")
+    private Set<String> genres;
 
     public VideoDocument(
             final String id,
@@ -83,9 +83,9 @@ public class VideoDocument {
             final String banner,
             final String thumbnail,
             final String thumbnailHalf,
-            final Set<String> categoriesId,
-            final Set<String> castMembersId,
-            final Set<String> genresId
+            final Set<String> categories,
+            final Set<String> castMembers,
+            final Set<String> genres
     ) {
         this.id = id;
         this.title = title;
@@ -102,9 +102,9 @@ public class VideoDocument {
         this.banner = banner;
         this.thumbnail = thumbnail;
         this.thumbnailHalf = thumbnailHalf;
-        this.categoriesId = categoriesId;
-        this.castMembersId = castMembersId;
-        this.genresId = genresId;
+        this.categories = categories;
+        this.castMembers = castMembers;
+        this.genres = genres;
     }
 
     public static VideoDocument from(final Video video) {
@@ -124,9 +124,9 @@ public class VideoDocument {
                 video.banner(),
                 video.thumbnail(),
                 video.thumbnailHalf(),
-                video.categories(),
-                video.castMembers(),
-                video.genres()
+                Set.copyOf(video.categories()),
+                Set.copyOf(video.castMembers()),
+                Set.copyOf(video.genres())
         );
     }
 
@@ -147,9 +147,9 @@ public class VideoDocument {
                 banner,
                 thumbnail,
                 thumbnailHalf,
-                categoriesId,
-                castMembersId,
-                genresId
+                categories,
+                castMembers,
+                genres
         );
     }
 
@@ -273,27 +273,27 @@ public class VideoDocument {
         this.thumbnailHalf = thumbnailHalf;
     }
 
-    public Set<String> categoriesId() {
-        return categoriesId;
+    public Set<String> categories() {
+        return categories;
     }
 
-    public void setCategoriesId(Set<String> categoriesId) {
-        this.categoriesId = categoriesId;
+    public void setCategoriesId(Set<String> categories) {
+        this.categories = categories;
     }
 
-    public Set<String> castMembersId() {
-        return castMembersId;
+    public Set<String> castMembers() {
+        return castMembers;
     }
 
-    public void setCastMembersId(Set<String> castMembersId) {
-        this.castMembersId = castMembersId;
+    public void setCastMembersId(Set<String> castMembers) {
+        this.castMembers = castMembers;
     }
 
-    public Set<String> genresId() {
-        return genresId;
+    public Set<String> genres() {
+        return genres;
     }
 
-    public void setGenresId(Set<String> genresId) {
-        this.genresId = genresId;
+    public void setGenresId(Set<String> genres) {
+        this.genres = genres;
     }
 }
