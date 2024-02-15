@@ -1,0 +1,85 @@
+extend type Query {
+    videos(
+        search: String = "",
+        page: Int = 0,
+        perPage: Int = 10,
+        sort: String = "title",
+        direction: String = "asc",
+        rating: String,
+        year_launched: Int,
+        categories: [String] = [],
+        castMembers: [String] = [],
+        genres: [String] = [],
+    ): [VideoResume]!
+
+    videoOfId(videoId: String!): Video
+}
+
+extend type Mutation {
+    saveVideo(input: VideoInput!): NewVideo!
+}
+
+""" A Video """
+type VideoResume {
+    id: ID!
+    title: String!
+    yearLaunched: String
+    rating: String!
+    duration: Float
+    trailer: String!
+    banner: String!
+    thumbnail: String!
+    thumbnailHalf: String!
+    createdAt: String!
+}
+
+type Video {
+    id: ID!
+    title: String!
+    description: String
+    yearLaunched: String
+    rating: String!
+    duration: Float
+    opened: Boolean!
+    published: Boolean!
+    video: String!
+    trailer: String!
+    banner: String!
+    thumbnail: String!
+    thumbnailHalf: String!
+    categoriesId: [String]!
+    categories: [Category]!
+    castMembersId: [String]!
+    castMembers: [CastMember]!
+    genresId: [String]!
+    genres: [Genre]
+    createdAt: String!
+    updatedAt: String!
+}
+
+""" A Video """
+type NewVideo {
+    id: ID!
+}
+
+""" A input to persist a Video """
+input VideoInput {
+    id: ID!
+    title: String!
+    description: String
+    yearLaunched: String
+    rating: String!
+    duration: Float
+    opened: Boolean!
+    published: Boolean!
+    video: String
+    trailer: String
+    banner: String
+    thumbnail: String
+    thumbnailHalf: String
+    categoriesId: [String]!
+    castMembersId: [String]!
+    genresId: [String]!
+    createdAt: String!
+    updatedAt: String!
+}
