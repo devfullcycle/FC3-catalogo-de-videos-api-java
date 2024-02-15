@@ -5,7 +5,7 @@ import com.fullcycle.catalogo.domain.video.Video;
 import com.fullcycle.catalogo.domain.video.VideoGateway;
 import com.fullcycle.catalogo.domain.video.VideoSearchQuery;
 import com.fullcycle.catalogo.infrastructure.video.persistence.VideoDocument;
-import com.fullcycle.catalogo.infrastructure.video.persistence.VideoQueryFactory;
+import com.fullcycle.catalogo.infrastructure.video.persistence.VideoQueryBuilder;
 import com.fullcycle.catalogo.infrastructure.video.persistence.VideoRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.Optional;
+
+import static com.fullcycle.catalogo.infrastructure.video.persistence.VideoQueryBuilder.*;
 
 @Component
 public class VideoElasticsearchGateway implements VideoGateway {
@@ -53,8 +55,18 @@ public class VideoElasticsearchGateway implements VideoGateway {
         final var currentPage = aQuery.page();
         final var itemsPerPage = aQuery.perPage();
 
+        final var queryB = new VideoQueryBuilder(
+                onlyPublished(),
+                containingGenres(aQuery.genres()),
+                containingCategories(aQuery.categories()),
+                containingCastMembers(aQuery.castMembers()),
+                withRating(aQuery.rating()),
+                withTitleOrDescriptionHaving(aQuery.terms()),
+                launchedAt(aQuery.launchedAt())
+        );
+
         final var query = NativeQuery.builder()
-                .withQuery(new VideoQueryFactory(aQuery).createQuery())
+                .withQuery(queryB.build())
                 .withPageable(PageRequest.of(
                         currentPage,
                         itemsPerPage,
