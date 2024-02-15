@@ -19,7 +19,7 @@ public class GenreDocument {
     )
     private String name;
 
-    @Field(type = FieldType.Boolean, name = "active")
+    @Field(type = FieldType.Boolean, name = "isActive")
     private boolean active;
 
     @Field(type = FieldType.Keyword, name = "categories")

@@ -147,7 +147,7 @@ class CastMemberListenerTest extends AbstractEmbeddedKafkaTest {
         final var gabrielEvent = CastMemberEvent.from(gabriel);
 
         final var message =
-                Json.writeValueAsString(new MessageValue<>(new ValuePayload<>(gabrielEvent, gabrielEvent, aSource(), Operation.CREATE)));
+                Json.writeValueAsString(new MessageValue<>(new ValuePayload<>(gabrielEvent, null, aSource(), Operation.CREATE)));
 
         final var latch = new CountDownLatch(1);
 
@@ -172,7 +172,7 @@ class CastMemberListenerTest extends AbstractEmbeddedKafkaTest {
         final var gabrielEvent = CastMemberEvent.from(gabriel);
 
         final var message =
-                Json.writeValueAsString(new MessageValue<>(new ValuePayload<>(gabrielEvent, gabrielEvent, aSource(), Operation.DELETE)));
+                Json.writeValueAsString(new MessageValue<>(new ValuePayload<>(null, gabrielEvent, aSource(), Operation.DELETE)));
 
         final var latch = new CountDownLatch(1);
 
