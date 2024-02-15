@@ -15,6 +15,11 @@ public record VideoSearchQuery(
         Set<String> genres
 ) {
 
+    public boolean hasFilter() {
+        return !terms().isBlank() || launchedAt != null || !rating().isBlank() ||
+                !categories().isEmpty() || !castMembers().isEmpty() || !genres().isEmpty();
+    }
+
     @Override
     public String terms() {
         return terms != null ? terms : "";
@@ -28,6 +33,11 @@ public record VideoSearchQuery(
     @Override
     public String direction() {
         return direction != null ? direction : "";
+    }
+
+    @Override
+    public String rating() {
+        return rating != null ? rating : "";
     }
 
     @Override

@@ -123,10 +123,6 @@ public final class Fixture {
 
     public static final class Videos {
 
-        public static Rating rating() {
-            return FAKER.options().option(Rating.values());
-        }
-
         public static Video systemDesign() {
             return Video.with(
                     IdUtils.uniqueId(),

@@ -161,7 +161,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
         final var expectedThumbnail = "http://thumb";
         final var expectedThumbnailHalf = "http://thumbhalf";
 
-        final var systemDesign = this.videoRepository.save(VideoDocument.from(Video.with(
+        this.videoRepository.save(VideoDocument.from(Video.with(
                 expectedId,
                 expectedTitle,
                 expectedDescription,
@@ -182,7 +182,6 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
                 expectedGenres
         )));
 
-        final var expectedId = systemDesign.id();
         Assertions.assertTrue(this.videoRepository.existsById(expectedId));
 
         // when
@@ -252,11 +251,63 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
         Assertions.assertEquals(expectedTotal, actualOutput.data().size());
     }
 
+    @Test
+    public void givenUnpublishedVideo_whenCallsFindAll_shouldReturnEmptyList() {
+        // given
+        final var expectedPage = 0;
+        final var expectedPerPage = 10;
+        final var expectedTerms = "";
+        final var expectedSort = "title";
+        final var expectedDirection = "asc";
+        final var expectedTotal = 0;
+        final Integer expectedYear = null;
+        final var expectedRating = "";
+        final var expectedCategories = Set.<String>of();
+        final var expectedCastMembers = Set.<String>of();
+        final var expectedGenres = Set.<String>of();
+
+        final var aQuery = new VideoSearchQuery(
+                expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection,
+                expectedRating, expectedYear,
+                expectedCategories, expectedCastMembers, expectedGenres
+        );
+
+        this.videoRepository.save(VideoDocument.from(Video.with(
+                IdUtils.uniqueId(),
+                "Cracking TypeScript",
+                "Um JavaScript fortemente tipado",
+                2023,
+                Fixture.duration(),
+                Rating.AGE_10.getName(),
+                true,
+                false,
+                InstantUtils.now().toString(),
+                InstantUtils.now().toString(),
+                "http://video",
+                "http://trailer",
+                "http://banner",
+                "http://thumb",
+                "http://thumbhalf",
+                Set.of("lives"),
+                Set.of("leonan"),
+                Set.of("typescript")
+        )));
+
+        // when
+        final var actualOutput = this.videoGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedTotal, actualOutput.data().size());
+    }
+
     @ParameterizedTest
     @CsvSource({
             "go,0,10,1,1,Golang 1.22",
             "jav,0,10,1,1,Java 21",
-            "sys,0,10,1,1,System Design no Mercado Livre na prática",
+            "design,0,10,1,1,System Design no Mercado Livre na prática",
             "assistido,0,10,1,1,System Design no Mercado Livre na prática",
             "FTW,0,10,1,1,Java 21",
             "linguagem,0,10,1,1,Golang 1.22",
@@ -267,7 +318,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
             final int expectedPerPage,
             final int expectedItemsCount,
             final long expectedTotal,
-            final String expectedName
+            final String expectedTitle
     ) {
         // given
         mockVideos();
@@ -292,7 +343,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
         Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
         Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
         Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
-        Assertions.assertEquals(expectedName, actualOutput.data().get(0).title());
+        Assertions.assertEquals(expectedTitle, actualOutput.data().get(0).title());
     }
 
     @ParameterizedTest
@@ -308,7 +359,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
             final int expectedPerPage,
             final int expectedItemsCount,
             final long expectedTotal,
-            final String expectedName
+            final String expectedTitle
     ) {
         // given
         mockVideos();
@@ -334,7 +385,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
         Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
         Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
         Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
-        Assertions.assertEquals(expectedName, actualOutput.data().get(0).title());
+        Assertions.assertEquals(expectedTitle, actualOutput.data().get(0).title());
     }
 
     @ParameterizedTest
@@ -350,7 +401,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
             final int expectedPerPage,
             final int expectedItemsCount,
             final long expectedTotal,
-            final String expectedName
+            final String expectedTitle
     ) {
         // given
         mockVideos();
@@ -376,7 +427,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
         Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
         Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
         Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
-        Assertions.assertEquals(expectedName, actualOutput.data().get(0).title());
+        Assertions.assertEquals(expectedTitle, actualOutput.data().get(0).title());
     }
 
     @ParameterizedTest
@@ -392,7 +443,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
             final int expectedPerPage,
             final int expectedItemsCount,
             final long expectedTotal,
-            final String expectedName
+            final String expectedTitle
     ) {
         // given
         mockVideos();
@@ -418,7 +469,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
         Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
         Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
         Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
-        Assertions.assertEquals(expectedName, actualOutput.data().get(0).title());
+        Assertions.assertEquals(expectedTitle, actualOutput.data().get(0).title());
     }
 
     @ParameterizedTest
@@ -435,7 +486,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
             final int expectedPerPage,
             final int expectedItemsCount,
             final long expectedTotal,
-            final String expectedName
+            final String expectedTitle
     ) {
         // given
         mockVideos();
@@ -460,7 +511,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
         Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
         Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
         Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
-        Assertions.assertEquals(expectedName, actualOutput.data().get(0).title());
+        Assertions.assertEquals(expectedTitle, actualOutput.data().get(0).title());
     }
 
     @ParameterizedTest
@@ -475,7 +526,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
             final int expectedPerPage,
             final int expectedItemsCount,
             final long expectedTotal,
-            final String expectedName
+            final String expectedTitle
     ) {
         // given
         mockVideos();
@@ -502,8 +553,8 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
         Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
         Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
 
-        if (StringUtils.isNotEmpty(expectedName)) {
-            Assertions.assertEquals(expectedName, actualOutput.data().get(0).title());
+        if (StringUtils.isNotEmpty(expectedTitle)) {
+            Assertions.assertEquals(expectedTitle, actualOutput.data().get(0).title());
         }
     }
 

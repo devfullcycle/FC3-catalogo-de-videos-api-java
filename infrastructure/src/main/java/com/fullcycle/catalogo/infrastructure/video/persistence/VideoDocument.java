@@ -14,7 +14,7 @@ public class VideoDocument {
     private String id;
 
     @MultiField(
-            mainField = @Field(type = FieldType.Text, name = "name"),
+            mainField = @Field(type = FieldType.Text, name = "title"),
             otherFields = @InnerField(suffix = "keyword", type = FieldType.Keyword)
     )
     private String title;
