@@ -14,9 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.graphql.test.tester.GraphQlTester;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -88,16 +90,25 @@ public class VideoGraphQLControllerTest {
                     castMembers {
                         id
                         name
+                        type
+                        createdAt
+                        updatedAt
                     }
                     categoriesId
                     categories {
                         id
                         name
+                        description
                     }
                     genresId
                     genres {
                         id
                         name
+                        active
+                        categories
+                        createdAt
+                        updatedAt
+                        deletedAt
                     }
                     createdAt
                     updatedAt
@@ -109,14 +120,12 @@ public class VideoGraphQLControllerTest {
         final var res = this.graphql.document(query).execute();
 
         final var actualVideos = res.path("videos")
-                .entityList(ListVideoUseCase.Output.class)
+                .entityList(VideoOutput.class)
                 .get();
 
         // then
-        Assertions.assertTrue(
-                actualVideos.size() == expectedVideos.size()
-                        && actualVideos.containsAll(expectedVideos)
-        );
+        compareVideoOutput(categories, castMembers, genres, expectedVideos.get(0), actualVideos.get(0));
+        compareVideoOutput(categories, castMembers, genres, expectedVideos.get(1), actualVideos.get(1));
 
         final var capturer = ArgumentCaptor.forClass(ListVideoUseCase.Input.class);
 
@@ -135,16 +144,50 @@ public class VideoGraphQLControllerTest {
         Assertions.assertEquals(expectedRating, actualQuery.rating());
     }
 
+    private static void compareVideoOutput(
+            List<GetAllCategoriesByIdUseCase.Output> expectedCategories,
+            List<GetAllCastMembersByIdUseCase.Output> expectedCastMembers,
+            List<GetAllGenresByIdUseCase.Output> expectedGenres,
+            ListVideoUseCase.Output expectedVideo,
+            VideoOutput actualVideo
+    ) {
+        assertThat(actualVideo)
+                .usingRecursiveComparison().ignoringFields("categories", "castMembers", "genres")
+                .isEqualTo(expectedVideo);
+
+
+        Assertions.assertTrue(
+                actualVideo.castMembers().size() == expectedCastMembers.size()
+                        && actualVideo.castMembers().containsAll(expectedCastMembers)
+        );
+
+        Assertions.assertTrue(
+                actualVideo.categories().size() == expectedCategories.size()
+                        && actualVideo.categories().containsAll(expectedCategories)
+        );
+
+        Assertions.assertTrue(
+                actualVideo.genres().size() == expectedGenres.size()
+                        && actualVideo.genres().containsAll(expectedGenres)
+        );
+    }
+
     @Test
     public void givenCustomArgumentsWhenCallsListGenresShouldReturn() {
         // given
-        final var categories = List.of(new GetAllCategoriesByIdUseCase.Output(Fixture.Categories.lives()));
-        final var castMembers = List.of(new GetAllCastMembersByIdUseCase.Output(Fixture.CastMembers.gabriel()));
-        final var genres = List.of(new GetAllGenresByIdUseCase.Output(Fixture.Genres.tech()));
+        record VideoIDOutput(String id) {}
+
+        final var java21 = Fixture.Videos.java21();
+        final var systemDesign = Fixture.Videos.systemDesign();
 
         final var expectedVideos = List.of(
-                ListVideoUseCase.Output.from(Fixture.Videos.java21()),
-                ListVideoUseCase.Output.from(Fixture.Videos.systemDesign())
+                ListVideoUseCase.Output.from(java21),
+                ListVideoUseCase.Output.from(systemDesign)
+        );
+
+        final var expectedVideosId = List.of(
+                new VideoIDOutput(java21.id()),
+                new VideoIDOutput(systemDesign.id())
         );
 
         final var expectedPage = 2;
@@ -161,44 +204,11 @@ public class VideoGraphQLControllerTest {
         when(this.listVideoUseCase.execute(any()))
                 .thenReturn(new Pagination<>(expectedPage, expectedPerPage, expectedGenres.size(), expectedVideos));
 
-        when(this.getAllCastMembersByIdUseCase.execute(any())).thenReturn(castMembers);
-        when(this.getAllCategoriesByIdUseCase.execute(any())).thenReturn(categories);
-        when(this.getAllGenresByIdUseCase.execute(any())).thenReturn(genres);
-
         final var query = """
                 query AllVideos($search: String, $page: Int, $perPage: Int, $sort: String, $direction: String, $rating: String, $yearLaunched: Int, $castMembers: [String], $categories: [String], $genres: [String]) {
                                 
                   videos(search: $search, page: $page, perPage: $perPage, sort: $sort, direction: $direction, rating: $rating, yearLaunched: $yearLaunched, castMembers: $castMembers, categories: $categories, genres: $genres) {
                     id
-                    title
-                    description
-                    yearLaunched
-                    rating
-                    duration
-                    opened
-                    published
-                    video
-                    trailer
-                    banner
-                    thumbnail
-                    thumbnailHalf
-                    castMembersId
-                    castMembers {
-                        id
-                        name
-                    }
-                    categoriesId
-                    categories {
-                        id
-                        name
-                    }
-                    genresId
-                    genres {
-                        id
-                        name
-                    }
-                    createdAt
-                    updatedAt
                   }
                 }
                 """;
@@ -218,13 +228,13 @@ public class VideoGraphQLControllerTest {
                 .execute();
 
         final var actualVideos = res.path("videos")
-                .entityList(ListVideoUseCase.Output.class)
+                .entityList(VideoIDOutput.class)
                 .get();
 
         // then
         Assertions.assertTrue(
-                actualVideos.size() == expectedVideos.size()
-                        && actualVideos.containsAll(expectedVideos)
+                actualVideos.size() == expectedVideosId.size()
+                        && actualVideos.containsAll(expectedVideosId)
         );
 
         final var capturer = ArgumentCaptor.forClass(ListVideoUseCase.Input.class);
@@ -242,5 +252,31 @@ public class VideoGraphQLControllerTest {
         Assertions.assertEquals(expectedGenres, actualQuery.genres());
         Assertions.assertEquals(expectedYearLaunched, actualQuery.launchedAt());
         Assertions.assertEquals(expectedRating, actualQuery.rating());
+    }
+
+    public record VideoOutput(
+            String id,
+            String title,
+            String description,
+            int yearLaunched,
+            String rating,
+            Double duration,
+            boolean opened,
+            boolean published,
+            String video,
+            String trailer,
+            String banner,
+            String thumbnail,
+            String thumbnailHalf,
+            Set<String> categoriesId,
+            Set<GetAllCategoriesByIdUseCase.Output> categories,
+            Set<String> castMembersId,
+            Set<GetAllCastMembersByIdUseCase.Output> castMembers,
+            Set<String> genresId,
+            Set<GetAllGenresByIdUseCase.Output> genres,
+            Instant createdAt,
+            Instant updatedAt
+    ) {
+
     }
 }

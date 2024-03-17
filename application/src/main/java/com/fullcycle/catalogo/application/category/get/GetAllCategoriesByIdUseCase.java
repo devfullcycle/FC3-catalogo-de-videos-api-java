@@ -39,16 +39,14 @@ public class GetAllCategoriesByIdUseCase extends UseCase<GetAllCategoriesByIdUse
     public record Output(
             String id,
             String name,
-            Instant createdAt,
-            Instant updatedAt
+            String description
     ) {
 
         public Output(final Category aCategory) {
             this(
                     aCategory.id(),
                     aCategory.name(),
-                    aCategory.createdAt(),
-                    aCategory.updatedAt()
+                    aCategory.description()
             );
         }
     }
