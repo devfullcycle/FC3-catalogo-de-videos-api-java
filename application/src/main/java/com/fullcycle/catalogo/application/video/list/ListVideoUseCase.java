@@ -6,6 +6,7 @@ import com.fullcycle.catalogo.domain.video.Video;
 import com.fullcycle.catalogo.domain.video.VideoGateway;
 import com.fullcycle.catalogo.domain.video.VideoSearchQuery;
 
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Set;
 
@@ -55,17 +56,21 @@ public class ListVideoUseCase extends UseCase<ListVideoUseCase.Input, Pagination
             String id,
             String title,
             String description,
-            boolean published,
             int yearLaunched,
             String rating,
+            Double duration,
+            boolean opened,
+            boolean published,
             String video,
             String trailer,
             String banner,
             String thumbnail,
             String thumbnailHalf,
-            Set<String> categories,
-            Set<String> castMembers,
-            Set<String> genres
+            Set<String> categoriesId,
+            Set<String> castMembersId,
+            Set<String> genresId,
+            Instant createdAt,
+            Instant updatedAt
     ) {
 
         public static Output from(Video video) {
@@ -73,9 +78,11 @@ public class ListVideoUseCase extends UseCase<ListVideoUseCase.Input, Pagination
                     video.id(),
                     video.title(),
                     video.description(),
-                    video.published(),
                     video.launchedAt().getValue(),
                     video.rating().getName(),
+                    video.duration(),
+                    video.opened(),
+                    video.published(),
                     video.video(),
                     video.trailer(),
                     video.banner(),
@@ -83,7 +90,9 @@ public class ListVideoUseCase extends UseCase<ListVideoUseCase.Input, Pagination
                     video.thumbnailHalf(),
                     video.categories(),
                     video.castMembers(),
-                    video.genres()
+                    video.genres(),
+                    video.createdAt(),
+                    video.updatedAt()
             );
         }
     }
