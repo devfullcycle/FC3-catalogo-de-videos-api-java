@@ -41,8 +41,13 @@ public class VideoElasticsearchGateway implements VideoGateway {
     }
 
     @Override
-    public Optional<Video> findById(String videoId) {
-        return Optional.empty();
+    public Optional<Video> findById(final String videoId) {
+        if (videoId == null || videoId.isBlank()) {
+            return Optional.empty();
+        }
+
+        return this.videoRepository.findById(videoId)
+                .map(VideoDocument::toVideo);
     }
 
     @Override
