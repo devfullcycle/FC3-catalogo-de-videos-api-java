@@ -5,8 +5,11 @@ import com.fullcycle.catalogo.application.castmember.get.GetAllCastMembersByIdUs
 import com.fullcycle.catalogo.application.category.get.GetAllCategoriesByIdUseCase;
 import com.fullcycle.catalogo.application.genre.get.GetAllGenresByIdUseCase;
 import com.fullcycle.catalogo.application.video.list.ListVideoUseCase;
+import com.fullcycle.catalogo.application.video.save.SaveVideoUseCase;
 import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
+import com.fullcycle.catalogo.domain.utils.IdUtils;
+import com.fullcycle.catalogo.domain.utils.InstantUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -15,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.graphql.test.tester.GraphQlTester;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -36,6 +40,9 @@ public class VideoGraphQLControllerTest {
 
     @MockBean
     private GetAllGenresByIdUseCase getAllGenresByIdUseCase;
+
+    @MockBean
+    private SaveVideoUseCase saveVideoUseCase;
 
     @Autowired
     private GraphQlTester graphql;
@@ -252,6 +259,158 @@ public class VideoGraphQLControllerTest {
         Assertions.assertEquals(expectedGenres, actualQuery.genres());
         Assertions.assertEquals(expectedYearLaunched, actualQuery.launchedAt());
         Assertions.assertEquals(expectedRating, actualQuery.rating());
+    }
+
+    @Test
+    public void givenVideoInput_whenCallsSaveVideoMutation_shouldPersistAndReturnId() {
+        // given
+        final var expectedId = IdUtils.uniqueId();
+        final var expectedTitle = "Java 21";
+        final var expectedDescription = "O vídeo mais assistido";
+        final var expectedYearLaunched = Fixture.year();
+        final var expectedRating = Fixture.Videos.rating().getName();
+        final var expectedDuration = Fixture.duration();
+        final var expectedOpened = false;
+        final var expectedPublished = true;
+        final var expectedVideo = "video";
+        final var expectedTrailer = "trailer";
+        final var expectedBanner = "banner";
+        final var expectedThumbnail = "thumb";
+        final var expectedThumbnailHalf = "thumbhalf";
+        final var expectedCastMembers = Set.of("cm1");
+        final var expectedCategories = Set.of("c1");
+        final var expectedGenres = Set.of("g1");
+        final var expectedDates = InstantUtils.now();
+
+        final var input = new HashMap<String, Object>();
+        input.put("id", expectedId);
+        input.put("title", expectedTitle);
+        input.put("description", expectedDescription);
+        input.put("yearLaunched", expectedYearLaunched);
+        input.put("rating", expectedRating);
+        input.put("duration", expectedDuration);
+        input.put("opened", expectedOpened);
+        input.put("published", expectedPublished);
+        input.put("video", expectedVideo);
+        input.put("trailer", expectedTrailer);
+        input.put("banner", expectedBanner);
+        input.put("thumbnail", expectedThumbnail);
+        input.put("thumbnailHalf", expectedThumbnailHalf);
+        input.put("castMembersId", expectedCastMembers);
+        input.put("categoriesId", expectedCategories);
+        input.put("genresId", expectedGenres);
+        input.put("createdAt", expectedDates.toString());
+        input.put("updatedAt", expectedDates.toString());
+
+        final var query = """
+                mutation SaveVideo($input: VideoInput!) {
+                    video: saveVideo(input: $input) {
+                        id
+                    }
+                }
+                """;
+
+        doReturn(new SaveVideoUseCase.Output(expectedId)).when(saveVideoUseCase).execute(any());
+
+        // when
+        this.graphql.document(query)
+                .variable("input", input)
+                .execute()
+                .path("video.id").entity(String.class).isEqualTo(expectedId);
+
+        // then
+        final var capturer = ArgumentCaptor.forClass(SaveVideoUseCase.Input.class);
+
+        verify(this.saveVideoUseCase, times(1)).execute(capturer.capture());
+
+        final var actualVideo = capturer.getValue();
+        Assertions.assertEquals(expectedId, actualVideo.id());
+        Assertions.assertEquals(expectedTitle, actualVideo.title());
+        Assertions.assertEquals(expectedDescription, actualVideo.description());
+        Assertions.assertEquals(expectedYearLaunched, actualVideo.launchedAt());
+        Assertions.assertEquals(expectedRating, actualVideo.rating());
+        Assertions.assertEquals(expectedDuration, actualVideo.duration());
+        Assertions.assertEquals(expectedOpened, actualVideo.opened());
+        Assertions.assertEquals(expectedPublished, actualVideo.published());
+        Assertions.assertEquals(expectedVideo, actualVideo.video());
+        Assertions.assertEquals(expectedTrailer, actualVideo.trailer());
+        Assertions.assertEquals(expectedBanner, actualVideo.banner());
+        Assertions.assertEquals(expectedThumbnail, actualVideo.thumbnail());
+        Assertions.assertEquals(expectedThumbnailHalf, actualVideo.thumbnailHalf());
+        Assertions.assertEquals(expectedCastMembers, actualVideo.castMembers());
+        Assertions.assertEquals(expectedCategories, actualVideo.categories());
+        Assertions.assertEquals(expectedGenres, actualVideo.genres());
+        Assertions.assertEquals(expectedDates.toString(), actualVideo.createdAt());
+        Assertions.assertEquals(expectedDates.toString(), actualVideo.updatedAt());
+    }
+
+    @Test
+    public void givenVideoInputWithOnlyRequiredProps_whenCallsSaveVideoMutation_shouldPersistAndReturnId() {
+        // given
+        final var expectedId = IdUtils.uniqueId();
+        final var expectedTitle = "Java 21";
+        final var expectedRating = Fixture.Videos.rating().getName();
+        final Double expectedDuration = 2.0;
+        final String expectedDescription = null;
+        final Integer expectedYearLaunched = null;
+        final Boolean expectedOpened = false;
+        final Boolean expectedPublished = false;
+        final String expectedVideo = null;
+        final String expectedTrailer = null;
+        final String expectedBanner = null;
+        final String expectedThumbnail = null;
+        final String expectedThumbnailHalf = null;
+        final Set<String> expectedCastMembers = Set.of();
+        final Set<String> expectedCategories = Set.of();
+        final Set<String> expectedGenres = Set.of();
+        final String expectedDates = null;
+
+        final var input = new HashMap<String, Object>();
+        input.put("id", expectedId);
+        input.put("title", expectedTitle);
+        input.put("rating", expectedRating);
+        input.put("duration", expectedDuration);
+
+        final var query = """
+                mutation SaveVideo($input: VideoInput!) {
+                    video: saveVideo(input: $input) {
+                        id
+                    }
+                }
+                """;
+
+        doReturn(new SaveVideoUseCase.Output(expectedId)).when(saveVideoUseCase).execute(any());
+
+        // when
+        this.graphql.document(query)
+                .variable("input", input)
+                .execute()
+                .path("video.id").entity(String.class).isEqualTo(expectedId);
+
+        // then
+        final var capturer = ArgumentCaptor.forClass(SaveVideoUseCase.Input.class);
+
+        verify(this.saveVideoUseCase, times(1)).execute(capturer.capture());
+
+        final var actualVideo = capturer.getValue();
+        Assertions.assertEquals(expectedId, actualVideo.id());
+        Assertions.assertEquals(expectedTitle, actualVideo.title());
+        Assertions.assertEquals(expectedDescription, actualVideo.description());
+        Assertions.assertEquals(expectedYearLaunched, actualVideo.launchedAt());
+        Assertions.assertEquals(expectedRating, actualVideo.rating());
+        Assertions.assertEquals(expectedDuration, actualVideo.duration());
+        Assertions.assertEquals(expectedOpened, actualVideo.opened());
+        Assertions.assertEquals(expectedPublished, actualVideo.published());
+        Assertions.assertEquals(expectedVideo, actualVideo.video());
+        Assertions.assertEquals(expectedTrailer, actualVideo.trailer());
+        Assertions.assertEquals(expectedBanner, actualVideo.banner());
+        Assertions.assertEquals(expectedThumbnail, actualVideo.thumbnail());
+        Assertions.assertEquals(expectedThumbnailHalf, actualVideo.thumbnailHalf());
+        Assertions.assertEquals(expectedCastMembers, actualVideo.castMembers());
+        Assertions.assertEquals(expectedCategories, actualVideo.categories());
+        Assertions.assertEquals(expectedGenres, actualVideo.genres());
+        Assertions.assertEquals(expectedDates, actualVideo.createdAt());
+        Assertions.assertEquals(expectedDates, actualVideo.updatedAt());
     }
 
     public record VideoOutput(

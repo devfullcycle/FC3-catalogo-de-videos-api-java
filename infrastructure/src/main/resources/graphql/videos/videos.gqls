@@ -54,7 +54,7 @@ input VideoInput {
     description: String
     yearLaunched: Int
     rating: String!
-    duration: Float
+    duration: Float!
     opened: Boolean
     published: Boolean
     video: String

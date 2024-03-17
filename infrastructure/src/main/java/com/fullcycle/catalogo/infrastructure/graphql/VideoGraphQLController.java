@@ -4,6 +4,7 @@ import com.fullcycle.catalogo.application.castmember.get.GetAllCastMembersByIdUs
 import com.fullcycle.catalogo.application.category.get.GetAllCategoriesByIdUseCase;
 import com.fullcycle.catalogo.application.genre.get.GetAllGenresByIdUseCase;
 import com.fullcycle.catalogo.application.video.list.ListVideoUseCase;
+import com.fullcycle.catalogo.application.video.save.SaveVideoUseCase;
 import com.fullcycle.catalogo.infrastructure.castmember.GqlCastMemberPresenter;
 import com.fullcycle.catalogo.infrastructure.castmember.models.GqlCastMember;
 import com.fullcycle.catalogo.infrastructure.category.GqlCategoryPresenter;
@@ -12,7 +13,9 @@ import com.fullcycle.catalogo.infrastructure.genre.GqlGenrePresenter;
 import com.fullcycle.catalogo.infrastructure.genre.models.GqlGenre;
 import com.fullcycle.catalogo.infrastructure.video.GqlVideoPresenter;
 import com.fullcycle.catalogo.infrastructure.video.models.GqlVideo;
+import com.fullcycle.catalogo.infrastructure.video.models.GqlVideoInput;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
@@ -28,17 +31,20 @@ public class VideoGraphQLController {
     private final GetAllCastMembersByIdUseCase getAllCastMembersByIdUseCase;
     private final GetAllCategoriesByIdUseCase getAllCategoriesByIdUseCase;
     private final GetAllGenresByIdUseCase getAllGenresByIdUseCase;
+    private final SaveVideoUseCase saveVideoUseCase;
 
     public VideoGraphQLController(
             final ListVideoUseCase listVideoUseCase,
             final GetAllCastMembersByIdUseCase getAllCastMembersByIdUseCase,
             final GetAllCategoriesByIdUseCase getAllCategoriesByIdUseCase,
-            final GetAllGenresByIdUseCase getAllGenresByIdUseCase
+            final GetAllGenresByIdUseCase getAllGenresByIdUseCase,
+            final SaveVideoUseCase saveVideoUseCase
     ) {
         this.listVideoUseCase = Objects.requireNonNull(listVideoUseCase);
         this.getAllCastMembersByIdUseCase = Objects.requireNonNull(getAllCastMembersByIdUseCase);
         this.getAllCategoriesByIdUseCase = Objects.requireNonNull(getAllCategoriesByIdUseCase);
         this.getAllGenresByIdUseCase = Objects.requireNonNull(getAllGenresByIdUseCase);
+        this.saveVideoUseCase = Objects.requireNonNull(saveVideoUseCase);
     }
 
     @QueryMapping
@@ -79,5 +85,17 @@ public class VideoGraphQLController {
         return this.getAllGenresByIdUseCase.execute(new GetAllGenresByIdUseCase.Input(video.castMembersId())).stream()
                 .map(GqlGenrePresenter::present)
                 .toList();
+    }
+
+    @MutationMapping
+    public SaveVideoUseCase.Output saveVideo(@Argument(name = "input") final GqlVideoInput arg) {
+        final var input = new SaveVideoUseCase.Input(
+                arg.id(), arg.title(), arg.description(), arg.yearLaunched(), arg.duration(),
+                arg.rating(), arg.opened(), arg.published(), arg.createdAt(), arg.updatedAt(),
+                arg.video(), arg.trailer(), arg.banner(), arg.thumbnail(), arg.thumbnailHalf(),
+                arg.categoriesId(), arg.castMembersId(), arg.genresId()
+        );
+
+        return this.saveVideoUseCase.execute(input);
     }
 }
