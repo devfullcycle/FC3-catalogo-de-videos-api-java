@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class GetAllByIdUseCase extends UseCase<GetAllByIdUseCase.Input, List<GetAllByIdUseCase.Output>> {
 
@@ -28,10 +29,10 @@ public class GetAllByIdUseCase extends UseCase<GetAllByIdUseCase.Input, List<Get
                 .toList();
     }
 
-    public record Input(List<String> ids) {
+    public record Input(Set<String> ids) {
         @Override
-        public List<String> ids() {
-            return ids != null ? ids : Collections.emptyList();
+        public Set<String> ids() {
+            return ids != null ? ids : Collections.emptySet();
         }
     }
 

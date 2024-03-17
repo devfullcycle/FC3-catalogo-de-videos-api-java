@@ -2,10 +2,8 @@ package com.fullcycle.catalogo.infrastructure.category;
 
 import com.fullcycle.catalogo.AbstractElasticsearchTest;
 import com.fullcycle.catalogo.domain.Fixture;
-import com.fullcycle.catalogo.domain.castmember.CastMember;
 import com.fullcycle.catalogo.domain.category.Category;
 import com.fullcycle.catalogo.domain.category.CategorySearchQuery;
-import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberDocument;
 import com.fullcycle.catalogo.infrastructure.category.persistence.CategoryDocument;
 import com.fullcycle.catalogo.infrastructure.category.persistence.CategoryRepository;
 import org.junit.jupiter.api.Assertions;
@@ -16,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Set;
 
 public class CategoryElasticsearchGatewayTest extends AbstractElasticsearchTest {
 
@@ -250,7 +249,7 @@ public class CategoryElasticsearchGatewayTest extends AbstractElasticsearchTest 
         final var lives = this.categoryRepository.save(CategoryDocument.from(Fixture.Categories.lives()));
 
         final var expectedSize = 2;
-        final var expectedIds = List.of(aulas.id(), lives.id());
+        final var expectedIds = Set.of(aulas.id(), lives.id());
 
         // when
         final var actualOutput = this.categoryGateway.findAllById(expectedIds);
@@ -266,7 +265,7 @@ public class CategoryElasticsearchGatewayTest extends AbstractElasticsearchTest 
     public void givenNullIds_whenCallsFindAllById_shouldReturnEmpty() {
         // given
         final var expectedItems = List.of();
-        final List<String> expectedIds = null;
+        final Set<String> expectedIds = null;
 
         // when
         final var actualOutput = this.categoryGateway.findAllById(expectedIds);
@@ -279,7 +278,7 @@ public class CategoryElasticsearchGatewayTest extends AbstractElasticsearchTest 
     public void givenEmptyIds_whenCallsFindAllById_shouldReturnEmpty() {
         // given
         final var expectedItems = List.of();
-        final List<String> expectedIds = List.of();
+        final Set<String> expectedIds = Set.of();
 
         // when
         final var actualOutput = this.categoryGateway.findAllById(expectedIds);

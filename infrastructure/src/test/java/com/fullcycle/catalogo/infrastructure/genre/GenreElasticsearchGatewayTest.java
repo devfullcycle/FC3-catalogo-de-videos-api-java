@@ -337,7 +337,7 @@ public class GenreElasticsearchGatewayTest extends AbstractElasticsearchTest {
         final var marketing = this.genreRepository.save(GenreDocument.from(Fixture.Genres.marketing()));
 
         final var expectedSize = 2;
-        final var expectedIds = List.of(tech.id(), marketing.id());
+        final var expectedIds = Set.of(tech.id(), marketing.id());
 
         // when
         final var actualOutput = this.genreGateway.findAllById(expectedIds);
@@ -353,7 +353,7 @@ public class GenreElasticsearchGatewayTest extends AbstractElasticsearchTest {
     public void givenNullIds_whenCallsFindAllById_shouldReturnEmpty() {
         // given
         final var expectedItems = List.of();
-        final List<String> expectedIds = null;
+        final Set<String> expectedIds = null;
 
         // when
         final var actualOutput = this.genreGateway.findAllById(expectedIds);
@@ -366,7 +366,7 @@ public class GenreElasticsearchGatewayTest extends AbstractElasticsearchTest {
     public void givenEmptyIds_whenCallsFindAllById_shouldReturnEmpty() {
         // given
         final var expectedItems = List.of();
-        final List<String> expectedIds = List.of();
+        final Set<String> expectedIds = Set.of();
 
         // when
         final var actualOutput = this.genreGateway.findAllById(expectedIds);

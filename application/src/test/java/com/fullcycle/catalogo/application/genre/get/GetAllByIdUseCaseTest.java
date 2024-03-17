@@ -10,6 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -34,7 +36,7 @@ class GetAllByIdUseCaseTest extends UseCaseTest {
                 .map(GetAllByIdUseCase.Output::new)
                 .toList();
 
-        final var expectedIds = genres.stream().map(Genre::id).toList();
+        final var expectedIds = genres.stream().map(Genre::id).collect(Collectors.toSet());
 
         when(this.genreGateway.findAllById(any()))
                 .thenReturn(genres);
@@ -54,7 +56,7 @@ class GetAllByIdUseCaseTest extends UseCaseTest {
     @Test
     public void givenNullIds_whenCallsGetAllById_shouldReturnEmpty() {
         // given
-        final List<String> expectedIds = null;
+        final Set<String> expectedIds = null;
 
         // when
         final var actualOutput = this.useCase.execute(new GetAllByIdUseCase.Input(expectedIds));

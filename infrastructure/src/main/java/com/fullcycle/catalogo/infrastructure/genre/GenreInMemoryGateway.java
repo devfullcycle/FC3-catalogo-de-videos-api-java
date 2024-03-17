@@ -8,6 +8,7 @@ import com.fullcycle.catalogo.domain.pagination.Pagination;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 //@Component
@@ -36,7 +37,7 @@ public class GenreInMemoryGateway implements GenreGateway {
     }
 
     @Override
-    public List<Genre> findAllById(List<String> genreId) {
+    public List<Genre> findAllById(Set<String> genreId) {
         if (genreId == null || genreId.isEmpty()) {
             return List.of();
         }

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.StreamSupport;
 
 import static org.springframework.data.elasticsearch.core.query.Criteria.where;
@@ -57,7 +58,7 @@ public class CategoryElasticsearchGateway implements CategoryGateway {
     }
 
     @Override
-    public List<Category> findAllById(final List<String> ids) {
+    public List<Category> findAllById(final Set<String> ids) {
         if (ids == null || ids.isEmpty()) {
             return List.of();
         }

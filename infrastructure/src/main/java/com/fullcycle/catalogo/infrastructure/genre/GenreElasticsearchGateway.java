@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.StreamSupport;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -59,7 +60,7 @@ public class GenreElasticsearchGateway implements GenreGateway {
     }
 
     @Override
-    public List<Genre> findAllById(final List<String> ids) {
+    public List<Genre> findAllById(final Set<String> ids) {
         if (ids == null || ids.isEmpty()) {
             return List.of();
         }

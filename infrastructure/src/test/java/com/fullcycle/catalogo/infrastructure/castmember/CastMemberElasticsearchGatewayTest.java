@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Set;
 
 class CastMemberElasticsearchGatewayTest extends AbstractElasticsearchTest {
 
@@ -244,7 +245,7 @@ class CastMemberElasticsearchGatewayTest extends AbstractElasticsearchTest {
         final var leonan = this.castMemberRepository.save(CastMemberDocument.from(Fixture.CastMembers.leonan()));
 
         final var expectedSize = 2;
-        final var expectedIds = List.of(gabriel.id(), leonan.id());
+        final var expectedIds = Set.of(gabriel.id(), leonan.id());
 
         // when
         final var actualOutput = this.castMemberGateway.findAllById(expectedIds);
@@ -260,7 +261,7 @@ class CastMemberElasticsearchGatewayTest extends AbstractElasticsearchTest {
     public void givenNullIds_whenCallsFindAllById_shouldReturnEmpty() {
         // given
         final var expectedItems = List.of();
-        final List<String> expectedIds = null;
+        final Set<String> expectedIds = null;
 
         // when
         final var actualOutput = this.castMemberGateway.findAllById(expectedIds);
@@ -273,7 +274,7 @@ class CastMemberElasticsearchGatewayTest extends AbstractElasticsearchTest {
     public void givenEmptyIds_whenCallsFindAllById_shouldReturnEmpty() {
         // given
         final var expectedItems = List.of();
-        final List<String> expectedIds = List.of();
+        final Set<String> expectedIds = Set.of();
 
         // when
         final var actualOutput = this.castMemberGateway.findAllById(expectedIds);
