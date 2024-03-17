@@ -6,11 +6,15 @@ import com.fullcycle.catalogo.domain.utils.IdUtils;
 import com.fullcycle.catalogo.domain.utils.InstantUtils;
 import com.fullcycle.catalogo.domain.video.Rating;
 import com.fullcycle.catalogo.domain.video.Video;
+import com.fullcycle.catalogo.domain.video.VideoSearchQuery;
 import com.fullcycle.catalogo.infrastructure.video.persistence.VideoDocument;
 import com.fullcycle.catalogo.infrastructure.video.persistence.VideoRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 
 import java.time.Year;
 import java.util.Set;
@@ -345,5 +349,313 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
         // then
         Assertions.assertNotNull(actualVideo);
         Assertions.assertTrue(actualVideo.isEmpty());
+    }
+
+    @Test
+    public void givenEmptyVideos_whenCallsFindAll_shouldReturnEmptyList() {
+        // given
+        final var expectedPage = 0;
+        final var expectedPerPage = 10;
+        final var expectedTerms = "";
+        final var expectedSort = "name";
+        final var expectedDirection = "asc";
+        final var expectedTotal = 0;
+        final String expectedRating = null;
+        final Integer expectedYearLaunched = null;
+        final var expectedCastMembers = Set.<String>of();
+        final var expectedCategories = Set.<String>of();
+        final var expectedGenres = Set.<String>of();
+
+        final var aQuery = new VideoSearchQuery(
+                expectedPage, expectedPerPage, expectedTerms,
+                expectedSort, expectedDirection, expectedRating, expectedYearLaunched,
+                expectedCategories, expectedCastMembers, expectedGenres
+        );
+
+        // when
+        final var actualOutput = this.videoGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedTotal, actualOutput.data().size());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "go,0,10,1,1,Golang 1.22",
+            "jav,0,10,1,1,Java 21",
+            "design,0,10,1,1,System Design no Mercado Livre na prática",
+            "assistido,0,10,1,1,System Design no Mercado Livre na prática",
+            "FTW,0,10,1,1,Java 21",
+            "linguagem,0,10,1,1,Golang 1.22",
+    })
+    public void givenValidTerm_whenCallsFindAll_shouldReturnElementsFiltered(
+            final String expectedTerms,
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedTitle
+    ) {
+        // given
+        mockVideos();
+
+        final var expectedSort = "title";
+        final var expectedDirection = "asc";
+        final String expectedRating = null;
+        final Integer expectedYearLaunched = null;
+        final var expectedCastMembers = Set.<String>of();
+        final var expectedCategories = Set.<String>of();
+        final var expectedGenres = Set.<String>of();
+
+
+        final var aQuery = new VideoSearchQuery(
+                expectedPage, expectedPerPage, expectedTerms,
+                expectedSort, expectedDirection, expectedRating, expectedYearLaunched,
+                expectedCategories, expectedCastMembers, expectedGenres
+        );
+
+        // when
+        final var actualOutput = this.videoGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+        Assertions.assertEquals(expectedTitle, actualOutput.data().get(0).title());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "meeting,0,10,1,1,Golang 1.22",
+            "aulas,0,10,1,1,System Design no Mercado Livre na prática",
+            "lives,0,10,1,1,Java 21",
+            ",0,10,3,3,Golang 1.22",
+    })
+    public void givenValidCategory_whenCallsFindAll_shouldReturnElementsFiltered(
+            final String categories,
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedName
+    ) {
+        // given
+        mockVideos();
+
+        final var expectedTerms = "";
+        final var expectedSort = "name";
+        final var expectedDirection = "asc";
+        final var expectedCategories = categories == null ? Set.<String>of() : Set.of(categories);
+        final String expectedRating = null;
+        final Integer expectedYearLaunched = null;
+        final var expectedCastMembers = Set.<String>of();
+        final var expectedGenres = Set.<String>of();
+
+
+        final var aQuery = new VideoSearchQuery(
+                expectedPage, expectedPerPage, expectedTerms,
+                expectedSort, expectedDirection, expectedRating, expectedYearLaunched,
+                expectedCategories, expectedCastMembers, expectedGenres
+        );
+
+        // when
+        final var actualOutput = this.videoGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+        Assertions.assertEquals(expectedName, actualOutput.data().get(0).title());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "gabriel,0,10,1,1,Java 21",
+            "wesley,0,10,1,1,Golang 1.22",
+            "luiz,0,10,1,1,System Design no Mercado Livre na prática",
+            ",0,10,3,3,Golang 1.22",
+    })
+    public void givenValidCastMember_whenCallsFindAll_shouldReturnElementsFiltered(
+            final String castMember,
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedName
+    ) {
+        // given
+        mockVideos();
+
+        final var expectedTerms = "";
+        final var expectedSort = "name";
+        final var expectedDirection = "asc";
+        final var expectedCastMembers = castMember == null ? Set.<String>of() : Set.of(castMember);
+        final String expectedRating = null;
+        final Integer expectedYearLaunched = null;
+        final var expectedCategories = Set.<String>of();
+        final var expectedGenres = Set.<String>of();
+
+
+        final var aQuery = new VideoSearchQuery(
+                expectedPage, expectedPerPage, expectedTerms,
+                expectedSort, expectedDirection, expectedRating, expectedYearLaunched,
+                expectedCategories, expectedCastMembers, expectedGenres
+        );
+
+        // when
+        final var actualOutput = this.videoGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+        Assertions.assertEquals(expectedName, actualOutput.data().get(0).title());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "java,0,10,1,1,Java 21",
+            "golang,0,10,1,1,Golang 1.22",
+            "systemdesign,0,10,1,1,System Design no Mercado Livre na prática",
+            ",0,10,3,3,Golang 1.22",
+    })
+    public void givenValidGenre_whenCallsFindAll_shouldReturnElementsFiltered(
+            final String genre,
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedName
+    ) {
+        // given
+        mockVideos();
+
+        final var expectedTerms = "";
+        final var expectedSort = "name";
+        final var expectedDirection = "asc";
+        final var expectedGenres = genre == null ? Set.<String>of() : Set.of(genre);
+        final String expectedRating = null;
+        final Integer expectedYearLaunched = null;
+        final var expectedCategories = Set.<String>of();
+        final var expectedCastMembers = Set.<String>of();
+
+
+        final var aQuery = new VideoSearchQuery(
+                expectedPage, expectedPerPage, expectedTerms,
+                expectedSort, expectedDirection, expectedRating, expectedYearLaunched,
+                expectedCategories, expectedCastMembers, expectedGenres
+        );
+
+        // when
+        final var actualOutput = this.videoGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+        Assertions.assertEquals(expectedName, actualOutput.data().get(0).title());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "title,asc,0,10,3,3,Golang 1.22",
+            "title,desc,0,10,3,3,System Design no Mercado Livre na prática",
+            "created_at,asc,0,10,3,3,System Design no Mercado Livre na prática",
+            "created_at,desc,0,10,3,3,Java 21",
+    })
+    public void givenValidSortAndDirection_whenCallsFindAll_shouldReturnElementsSorted(
+            final String expectedSort,
+            final String expectedDirection,
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedName
+    ) {
+        // given
+        mockVideos();
+
+        final var expectedTerms = "";
+        final String expectedRating = null;
+        final Integer expectedYearLaunched = null;
+        final var expectedCategories = Set.<String>of();
+        final var expectedCastMembers = Set.<String>of();
+        final var expectedGenres = Set.<String>of();
+
+
+        final var aQuery = new VideoSearchQuery(
+                expectedPage, expectedPerPage, expectedTerms,
+                expectedSort, expectedDirection, expectedRating, expectedYearLaunched,
+                expectedCategories, expectedCastMembers, expectedGenres
+        );
+
+        // when
+        final var actualOutput = this.videoGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+        Assertions.assertEquals(expectedName, actualOutput.data().get(0).title());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "0,1,1,3,Golang 1.22",
+            "1,1,1,3,Java 21",
+            "2,1,1,3,System Design no Mercado Livre na prática",
+            "3,1,0,3,",
+    })
+    public void givenValidPage_whenCallsFindAll_shouldReturnElementsPaged(
+            final int expectedPage,
+            final int expectedPerPage,
+            final int expectedItemsCount,
+            final long expectedTotal,
+            final String expectedName
+    ) {
+        // given
+        mockVideos();
+
+        final var expectedTerms = "";
+        final var expectedSort = "name";
+        final var expectedDirection = "asc";
+        final String expectedRating = null;
+        final Integer expectedYearLaunched = null;
+        final var expectedCategories = Set.<String>of();
+        final var expectedCastMembers = Set.<String>of();
+        final var expectedGenres = Set.<String>of();
+
+        final var aQuery = new VideoSearchQuery(
+                expectedPage, expectedPerPage, expectedTerms,
+                expectedSort, expectedDirection, expectedRating, expectedYearLaunched,
+                expectedCategories, expectedCastMembers, expectedGenres
+        );
+
+        // when
+        final var actualOutput = this.videoGateway.findAll(aQuery);
+
+        // then
+        Assertions.assertEquals(expectedPage, actualOutput.meta().currentPage());
+        Assertions.assertEquals(expectedPerPage, actualOutput.meta().perPage());
+        Assertions.assertEquals(expectedTotal, actualOutput.meta().total());
+        Assertions.assertEquals(expectedItemsCount, actualOutput.data().size());
+
+        if (StringUtils.isNotEmpty(expectedName)) {
+            Assertions.assertEquals(expectedName, actualOutput.data().get(0).title());
+        }
+    }
+
+    private void mockVideos() {
+        this.videoRepository.save(VideoDocument.from(Fixture.Videos.systemDesign()));
+        this.videoRepository.save(VideoDocument.from(Fixture.Videos.golang()));
+        this.videoRepository.save(VideoDocument.from(Fixture.Videos.java21()));
     }
 }
