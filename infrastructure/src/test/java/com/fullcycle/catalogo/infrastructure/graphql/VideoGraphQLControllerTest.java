@@ -351,8 +351,9 @@ public class VideoGraphQLControllerTest {
         final var expectedTitle = "Java 21";
         final var expectedRating = Fixture.Videos.rating().getName();
         final Double expectedDuration = 2.0;
+        final Integer expectedYearLaunched = 2024;
+        final String expectedDates = InstantUtils.now().toString();
         final String expectedDescription = null;
-        final Integer expectedYearLaunched = null;
         final Boolean expectedOpened = false;
         final Boolean expectedPublished = false;
         final String expectedVideo = null;
@@ -363,13 +364,15 @@ public class VideoGraphQLControllerTest {
         final Set<String> expectedCastMembers = Set.of();
         final Set<String> expectedCategories = Set.of();
         final Set<String> expectedGenres = Set.of();
-        final String expectedDates = null;
 
         final var input = new HashMap<String, Object>();
         input.put("id", expectedId);
         input.put("title", expectedTitle);
         input.put("rating", expectedRating);
         input.put("duration", expectedDuration);
+        input.put("yearLaunched", expectedYearLaunched);
+        input.put("createdAt", expectedDates);
+        input.put("updatedAt", expectedDates);
 
         final var query = """
                 mutation SaveVideo($input: VideoInput!) {

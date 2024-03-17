@@ -52,7 +52,7 @@ input VideoInput {
     id: ID!
     title: String!
     description: String
-    yearLaunched: Int
+    yearLaunched: Int!
     rating: String!
     duration: Float!
     opened: Boolean
@@ -65,6 +65,6 @@ input VideoInput {
     castMembersId: [String]
     categoriesId: [String]
     genresId: [String]
-    createdAt: String
-    updatedAt: String
+    createdAt: String!
+    updatedAt: String!
 }

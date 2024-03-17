@@ -57,13 +57,13 @@ public class Video {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.launchedAt = Year.of(launchedAt);
+        this.launchedAt = launchedAt != null ? Year.of(launchedAt) : null;
         this.duration = duration;
         this.rating = Rating.of(rating).orElse(null);
         this.opened = opened;
         this.published = published;
-        this.createdAt = Instant.parse(createdAt);
-        this.updatedAt = Instant.parse(updatedAt);
+        this.createdAt = createdAt != null ? Instant.parse(createdAt) : null;
+        this.updatedAt = updatedAt != null ? Instant.parse(updatedAt) : null;
         this.video = video;
         this.trailer = trailer;
         this.banner = banner;

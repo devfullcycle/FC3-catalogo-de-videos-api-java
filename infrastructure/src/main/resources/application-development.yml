@@ -1,5 +1,21 @@
+elasticsearch:
+  uris: http://localhost:9200
+  username: elastic
+  password: elastic
+
 graphql:
   graphiql: true
+
+keycloak:
+  client-id: ${KEYCLOAK_CLIENT_ID}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET}
+  host: ${KEYCLOAK_HOST:http://keycloak.internal:8443}
+  realm: ${KEYCLOAK_REALM:fc3-codeflix}
+
+rest-client:
+  base-url: http://localhost:8080
+  keycloak:
+    read-timeout: 1_000
 
 spring:
   autoconfigure:
@@ -7,3 +23,4 @@ spring:
       - org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration
       - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
       - org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
