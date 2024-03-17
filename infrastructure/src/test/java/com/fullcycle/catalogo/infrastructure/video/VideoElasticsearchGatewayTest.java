@@ -6,6 +6,7 @@ import com.fullcycle.catalogo.domain.utils.IdUtils;
 import com.fullcycle.catalogo.domain.utils.InstantUtils;
 import com.fullcycle.catalogo.domain.video.Rating;
 import com.fullcycle.catalogo.domain.video.Video;
+import com.fullcycle.catalogo.infrastructure.video.persistence.VideoDocument;
 import com.fullcycle.catalogo.infrastructure.video.persistence.VideoRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -180,5 +181,49 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
         Assertions.assertEquals(expectedBanner, actualVideo.banner());
         Assertions.assertEquals(expectedThumbnail, actualVideo.thumbnail());
         Assertions.assertEquals(expectedThumbnailHalf, actualVideo.thumbnailHalf());
+    }
+
+    @Test
+    public void givenValidId_whenCallsDeleteById_shouldDeleteIt() {
+        // given
+        final var java21 = Fixture.Videos.java21();
+
+        this.videoRepository.save(VideoDocument.from(java21));
+
+        final var expectedId = java21.id();
+        Assertions.assertTrue(this.videoRepository.existsById(expectedId));
+
+        // when
+        this.videoGateway.deleteById(expectedId);
+
+        // then
+        Assertions.assertFalse(this.videoRepository.existsById(expectedId));
+    }
+
+    @Test
+    public void givenInvalidId_whenCallsDeleteById_shouldBeOk() {
+        // given
+        final var expectedId = "any";
+
+        // when/then
+        Assertions.assertDoesNotThrow(() -> this.videoGateway.deleteById(expectedId));
+    }
+
+    @Test
+    public void givenNullId_whenCallsDeleteById_shouldBeOk() {
+        // given
+        final String expectedId = null;
+
+        // when/then
+        Assertions.assertDoesNotThrow(() -> this.videoGateway.deleteById(expectedId));
+    }
+
+    @Test
+    public void givenEmptyId_whenCallsDeleteById_shouldBeOk() {
+        // given
+        final var expectedId = " ";
+
+        // when/then
+        Assertions.assertDoesNotThrow(() -> this.videoGateway.deleteById(expectedId));
     }
 }
