@@ -1,7 +1,7 @@
 package com.fullcycle.catalogo.infrastructure.configuration.usecases;
 
 import com.fullcycle.catalogo.application.category.delete.DeleteCategoryUseCase;
-import com.fullcycle.catalogo.application.category.get.GetAllByIdUseCase;
+import com.fullcycle.catalogo.application.category.get.GetAllCategoriesByIdUseCase;
 import com.fullcycle.catalogo.application.category.list.ListCategoryUseCase;
 import com.fullcycle.catalogo.application.category.save.SaveCategoryUseCase;
 import com.fullcycle.catalogo.domain.category.CategoryGateway;
@@ -35,7 +35,7 @@ public class CategoryUseCasesConfig {
     }
 
     @Bean
-    GetAllByIdUseCase getAllByIdUseCase() {
-        return new GetAllByIdUseCase(categoryGateway);
+    GetAllCategoriesByIdUseCase getAllCategoriesByIdUseCase() {
+        return new GetAllCategoriesByIdUseCase(categoryGateway);
     }
 }

@@ -1,7 +1,7 @@
 package com.fullcycle.catalogo.infrastructure.configuration.usecases;
 
 import com.fullcycle.catalogo.application.genre.delete.DeleteGenreUseCase;
-import com.fullcycle.catalogo.application.genre.get.GetAllByIdUseCase;
+import com.fullcycle.catalogo.application.genre.get.GetAllGenresByIdUseCase;
 import com.fullcycle.catalogo.application.genre.list.ListGenreUseCase;
 import com.fullcycle.catalogo.application.genre.save.SaveGenreUseCase;
 import com.fullcycle.catalogo.domain.genre.GenreGateway;
@@ -35,7 +35,7 @@ public class GenreUseCasesConfig {
     }
 
     @Bean
-    GetAllByIdUseCase getAllByIdUseCase() {
-        return new GetAllByIdUseCase(genreGateway);
+    GetAllGenresByIdUseCase getAllGenresByIdUseCase() {
+        return new GetAllGenresByIdUseCase(genreGateway);
     }
 }

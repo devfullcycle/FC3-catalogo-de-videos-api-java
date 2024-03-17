@@ -1,0 +1,70 @@
+extend type Query {
+    videos(
+        search: String = "",
+        page: Int = 0,
+        perPage: Int = 10,
+        sort: String = "name",
+        direction: String = "asc",
+        rating: String,
+        yearLaunched: Int,
+        castMembers: [String] = [],
+        categories: [String] = [],
+        genres: [String] = [],
+    ): [Video]!
+}
+
+extend type Mutation {
+    saveVideo(input: VideoInput!): NewVideo!
+}
+
+""" A Video """
+type Video {
+    id: ID!
+    title: String!
+    description: String
+    yearLaunched: Int
+    rating: String!
+    duration: Float
+    opened: Boolean!
+    published: Boolean!
+    video: String!
+    trailer: String!
+    banner: String!
+    thumbnail: String!
+    thumbnailHalf: String!
+    castMembersId: [String]!
+    castMembers: [CastMember]!
+    categoriesId: [String]!
+    categories: [Category]!
+    genresId: [String]!
+    genres: [Genre]!
+    createdAt: String!
+    updatedAt: String!
+}
+
+""" A saveVideo result """
+type NewVideo {
+    id: ID!
+}
+
+""" A input to persist a Video """
+input VideoInput {
+    id: ID!
+    title: String!
+    description: String
+    yearLaunched: Int
+    rating: String!
+    duration: Float
+    opened: Boolean
+    published: Boolean
+    video: String
+    trailer: String
+    banner: String
+    thumbnail: String
+    thumbnailHalf: String
+    castMembersId: [String]
+    categoriesId: [String]
+    genresId: [String]
+    createdAt: String
+    updatedAt: String
+}
