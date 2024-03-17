@@ -4,6 +4,7 @@ import com.fullcycle.catalogo.domain.pagination.Pagination;
 import com.fullcycle.catalogo.domain.video.Video;
 import com.fullcycle.catalogo.domain.video.VideoGateway;
 import com.fullcycle.catalogo.domain.video.VideoSearchQuery;
+import com.fullcycle.catalogo.infrastructure.video.persistence.VideoDocument;
 import com.fullcycle.catalogo.infrastructure.video.persistence.VideoRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.elasticsearch.core.SearchOperations;
@@ -25,8 +26,9 @@ public class VideoElasticsearchGateway implements VideoGateway {
     }
 
     @Override
-    public Video save(Video video) {
-        return null;
+    public Video save(final Video video) {
+        this.videoRepository.save(VideoDocument.from(video));
+        return video;
     }
 
     @Override
