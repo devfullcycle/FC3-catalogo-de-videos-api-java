@@ -1,6 +1,9 @@
 package com.fullcycle.catalogo.infrastructure.graphql;
 
 import com.fullcycle.catalogo.GraphQLControllerTest;
+import com.fullcycle.catalogo.application.castmember.get.GetAllCastMembersByIdUseCase;
+import com.fullcycle.catalogo.application.category.get.GetAllCategoriesByIdUseCase;
+import com.fullcycle.catalogo.application.genre.get.GetAllGenresByIdUseCase;
 import com.fullcycle.catalogo.application.video.list.ListVideoUseCase;
 import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
@@ -9,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.graphql.test.tester.GraphQlTester;
 
 import java.util.List;
@@ -24,12 +26,25 @@ public class VideoGraphQLControllerTest {
     @MockBean
     private ListVideoUseCase listVideoUseCase;
 
+    @MockBean
+    private GetAllCastMembersByIdUseCase getAllCastMembersByIdUseCase;
+
+    @MockBean
+    private GetAllCategoriesByIdUseCase getAllCategoriesByIdUseCase;
+
+    @MockBean
+    private GetAllGenresByIdUseCase getAllGenresByIdUseCase;
+
     @Autowired
     private GraphQlTester graphql;
 
     @Test
     public void givenDefaultArgumentsWhenCallsListVideosShouldReturn() {
         // given
+        final var categories = List.of(new GetAllCategoriesByIdUseCase.Output(Fixture.Categories.lives()));
+        final var castMembers = List.of(new GetAllCastMembersByIdUseCase.Output(Fixture.CastMembers.gabriel()));
+        final var genres = List.of(new GetAllGenresByIdUseCase.Output(Fixture.Genres.tech()));
+
         final var expectedVideos = List.of(
                 ListVideoUseCase.Output.from(Fixture.Videos.java21()),
                 ListVideoUseCase.Output.from(Fixture.Videos.systemDesign())
@@ -40,7 +55,7 @@ public class VideoGraphQLControllerTest {
         final var expectedSort = "name";
         final var expectedDirection = "asc";
         final var expectedSearch = "";
-        final var expectedRating = "";
+        final String expectedRating = null;
         final Integer expectedYearLaunched = null;
         final var expectedCastMembers = Set.of();
         final var expectedCategories = Set.of();
@@ -48,6 +63,10 @@ public class VideoGraphQLControllerTest {
 
         when(this.listVideoUseCase.execute(any()))
                 .thenReturn(new Pagination<>(expectedPage, expectedPerPage, expectedVideos.size(), expectedVideos));
+
+        when(this.getAllCastMembersByIdUseCase.execute(any())).thenReturn(castMembers);
+        when(this.getAllCategoriesByIdUseCase.execute(any())).thenReturn(categories);
+        when(this.getAllGenresByIdUseCase.execute(any())).thenReturn(genres);
 
         final var query = """
                 {
@@ -66,11 +85,20 @@ public class VideoGraphQLControllerTest {
                     thumbnail
                     thumbnailHalf
                     castMembersId
-                    castMembers
+                    castMembers {
+                        id
+                        name
+                    }
                     categoriesId
-                    categories
+                    categories {
+                        id
+                        name
+                    }
                     genresId
-                    genres
+                    genres {
+                        id
+                        name
+                    }
                     createdAt
                     updatedAt
                   }
@@ -110,6 +138,10 @@ public class VideoGraphQLControllerTest {
     @Test
     public void givenCustomArgumentsWhenCallsListGenresShouldReturn() {
         // given
+        final var categories = List.of(new GetAllCategoriesByIdUseCase.Output(Fixture.Categories.lives()));
+        final var castMembers = List.of(new GetAllCastMembersByIdUseCase.Output(Fixture.CastMembers.gabriel()));
+        final var genres = List.of(new GetAllGenresByIdUseCase.Output(Fixture.Genres.tech()));
+
         final var expectedVideos = List.of(
                 ListVideoUseCase.Output.from(Fixture.Videos.java21()),
                 ListVideoUseCase.Output.from(Fixture.Videos.systemDesign())
@@ -129,6 +161,10 @@ public class VideoGraphQLControllerTest {
         when(this.listVideoUseCase.execute(any()))
                 .thenReturn(new Pagination<>(expectedPage, expectedPerPage, expectedGenres.size(), expectedVideos));
 
+        when(this.getAllCastMembersByIdUseCase.execute(any())).thenReturn(castMembers);
+        when(this.getAllCategoriesByIdUseCase.execute(any())).thenReturn(categories);
+        when(this.getAllGenresByIdUseCase.execute(any())).thenReturn(genres);
+
         final var query = """
                 query AllVideos($search: String, $page: Int, $perPage: Int, $sort: String, $direction: String, $rating: String, $yearLaunched: Int, $castMembers: [String], $categories: [String], $genres: [String]) {
                                 
@@ -147,11 +183,20 @@ public class VideoGraphQLControllerTest {
                     thumbnail
                     thumbnailHalf
                     castMembersId
-                    castMembers
+                    castMembers {
+                        id
+                        name
+                    }
                     categoriesId
-                    categories
+                    categories {
+                        id
+                        name
+                    }
                     genresId
-                    genres
+                    genres {
+                        id
+                        name
+                    }
                     createdAt
                     updatedAt
                   }
