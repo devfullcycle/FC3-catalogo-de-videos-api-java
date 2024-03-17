@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.fullcycle.catalogo.domain.utils.InstantUtils.now;
@@ -326,6 +327,52 @@ public class GenreElasticsearchGatewayTest extends AbstractElasticsearchTest {
         if (StringUtils.isNotEmpty(expectedName)) {
             Assertions.assertEquals(expectedName, actualOutput.data().get(0).name());
         }
+    }
+
+    @Test
+    public void givenValidIds_whenCallsFindAllById_shouldReturnElements() {
+        // given
+        final var tech = this.genreRepository.save(GenreDocument.from(Fixture.Genres.tech()));
+        this.genreRepository.save(GenreDocument.from(Fixture.Genres.business()));
+        final var marketing = this.genreRepository.save(GenreDocument.from(Fixture.Genres.marketing()));
+
+        final var expectedSize = 2;
+        final var expectedIds = List.of(tech.id(), marketing.id());
+
+        // when
+        final var actualOutput = this.genreGateway.findAllById(expectedIds);
+
+        // then
+        Assertions.assertEquals(expectedSize, actualOutput.size());
+
+        final var actualIds = actualOutput.stream().map(Genre::id).toList();
+        Assertions.assertTrue(expectedIds.containsAll(actualIds));
+    }
+
+    @Test
+    public void givenNullIds_whenCallsFindAllById_shouldReturnEmpty() {
+        // given
+        final var expectedItems = List.of();
+        final List<String> expectedIds = null;
+
+        // when
+        final var actualOutput = this.genreGateway.findAllById(expectedIds);
+
+        // then
+        Assertions.assertEquals(expectedItems, actualOutput);
+    }
+
+    @Test
+    public void givenEmptyIds_whenCallsFindAllById_shouldReturnEmpty() {
+        // given
+        final var expectedItems = List.of();
+        final List<String> expectedIds = List.of();
+
+        // when
+        final var actualOutput = this.genreGateway.findAllById(expectedIds);
+
+        // then
+        Assertions.assertEquals(expectedItems, actualOutput);
     }
 
     private void mockGenres() {

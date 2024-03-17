@@ -5,6 +5,7 @@ import com.fullcycle.catalogo.domain.genre.GenreGateway;
 import com.fullcycle.catalogo.domain.genre.GenreSearchQuery;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,6 +33,16 @@ public class GenreInMemoryGateway implements GenreGateway {
     @Override
     public Optional<Genre> findById(String genreId) {
         return Optional.ofNullable(this.db.get(genreId));
+    }
+
+    @Override
+    public List<Genre> findAllById(List<String> genreId) {
+        if (genreId == null || genreId.isEmpty()) {
+            return List.of();
+        }
+        return genreId.stream()
+                .map(this.db::get)
+                .toList();
     }
 
     @Override
