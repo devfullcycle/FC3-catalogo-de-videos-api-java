@@ -20,7 +20,7 @@ import java.util.Map;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.mockito.Mockito.doReturn;
 
-class GenreRestGatewayTest extends AbstractRestClientTest {
+class GenreRestClientTest extends AbstractRestClientTest {
 
     @Autowired
     private GenreRestClient target;
