@@ -357,7 +357,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
         final var expectedPage = 0;
         final var expectedPerPage = 10;
         final var expectedTerms = "";
-        final var expectedSort = "name";
+        final var expectedSort = "title";
         final var expectedDirection = "asc";
         final var expectedTotal = 0;
         final String expectedRating = null;
@@ -447,7 +447,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
         mockVideos();
 
         final var expectedTerms = "";
-        final var expectedSort = "name";
+        final var expectedSort = "title";
         final var expectedDirection = "asc";
         final var expectedCategories = categories == null ? Set.<String>of() : Set.of(categories);
         final String expectedRating = null;
@@ -492,7 +492,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
         mockVideos();
 
         final var expectedTerms = "";
-        final var expectedSort = "name";
+        final var expectedSort = "title";
         final var expectedDirection = "asc";
         final var expectedCastMembers = castMember == null ? Set.<String>of() : Set.of(castMember);
         final String expectedRating = null;
@@ -537,7 +537,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
         mockVideos();
 
         final var expectedTerms = "";
-        final var expectedSort = "name";
+        final var expectedSort = "title";
         final var expectedDirection = "asc";
         final var expectedGenres = genre == null ? Set.<String>of() : Set.of(genre);
         final String expectedRating = null;
@@ -625,7 +625,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
         mockVideos();
 
         final var expectedTerms = "";
-        final var expectedSort = "name";
+        final var expectedSort = "title";
         final var expectedDirection = "asc";
         final String expectedRating = null;
         final Integer expectedYearLaunched = null;

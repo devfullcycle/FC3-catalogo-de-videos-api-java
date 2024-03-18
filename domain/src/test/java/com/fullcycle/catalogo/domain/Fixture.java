@@ -145,7 +145,7 @@ public final class Fixture {
                     "http://thumb",
                     "http://thumbhalf",
                     Set.of("aulas"),
-                    Set.of("gabriel"),
+                    Set.of("luiz"),
                     Set.of("systemdesign")
             );
         }
