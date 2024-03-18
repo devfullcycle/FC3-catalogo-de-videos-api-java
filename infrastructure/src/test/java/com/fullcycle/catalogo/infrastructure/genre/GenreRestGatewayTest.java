@@ -23,7 +23,7 @@ import static org.mockito.Mockito.doReturn;
 class GenreRestGatewayTest extends AbstractRestClientTest {
 
     @Autowired
-    private GenreRestGateway target;
+    private GenreRestClient target;
 
     @SpyBean
     private ClientCredentialsManager credentialsManager;

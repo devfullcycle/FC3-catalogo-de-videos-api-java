@@ -6,7 +6,7 @@ import com.fullcycle.catalogo.application.genre.save.SaveGenreUseCase;
 import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.infrastructure.category.models.CategoryEvent;
 import com.fullcycle.catalogo.infrastructure.configuration.json.Json;
-import com.fullcycle.catalogo.infrastructure.genre.GenreGateway;
+import com.fullcycle.catalogo.infrastructure.genre.GenreClient;
 import com.fullcycle.catalogo.infrastructure.genre.models.GenreDTO;
 import com.fullcycle.catalogo.infrastructure.genre.models.GenreEvent;
 import com.fullcycle.catalogo.infrastructure.kafka.models.connect.MessageValue;
@@ -41,7 +41,7 @@ class GenreListenerTest extends AbstractEmbeddedKafkaTest {
     private SaveGenreUseCase saveGenreUseCase;
 
     @MockBean
-    private GenreGateway genreGateway;
+    private GenreClient genreClient;
 
     @SpyBean
     private GenreListener genreListener;
@@ -138,7 +138,7 @@ class GenreListenerTest extends AbstractEmbeddedKafkaTest {
             return new SaveGenreUseCase.Output(tech.id());
         }).when(saveGenreUseCase).execute(any());
 
-        doReturn(Optional.of(GenreDTO.from(tech))).when(genreGateway).genreOfId(any());
+        doReturn(Optional.of(GenreDTO.from(tech))).when(genreClient).genreOfId(any());
 
         // when
         producer().send(new ProducerRecord<>(genreTopics, message)).get(10, TimeUnit.SECONDS);
@@ -146,7 +146,7 @@ class GenreListenerTest extends AbstractEmbeddedKafkaTest {
         Assertions.assertTrue(latch.await(1, TimeUnit.MINUTES));
 
         // then
-        verify(genreGateway, times(1)).genreOfId(eq(tech.id()));
+        verify(genreClient, times(1)).genreOfId(eq(tech.id()));
 
         verify(saveGenreUseCase, times(1)).execute(refEq(new SaveGenreUseCase.Input(
                 tech.id(),
@@ -175,7 +175,7 @@ class GenreListenerTest extends AbstractEmbeddedKafkaTest {
             return new SaveGenreUseCase.Output(tech.id());
         }).when(saveGenreUseCase).execute(any());
 
-        doReturn(Optional.of(GenreDTO.from(tech))).when(genreGateway).genreOfId(any());
+        doReturn(Optional.of(GenreDTO.from(tech))).when(genreClient).genreOfId(any());
 
         // when
         producer().send(new ProducerRecord<>(genreTopics, message)).get(10, TimeUnit.SECONDS);
@@ -183,7 +183,7 @@ class GenreListenerTest extends AbstractEmbeddedKafkaTest {
         Assertions.assertTrue(latch.await(1, TimeUnit.MINUTES));
 
         // then
-        verify(genreGateway, times(1)).genreOfId(eq(tech.id()));
+        verify(genreClient, times(1)).genreOfId(eq(tech.id()));
 
         verify(saveGenreUseCase, times(1)).execute(refEq(new SaveGenreUseCase.Input(
                 tech.id(),

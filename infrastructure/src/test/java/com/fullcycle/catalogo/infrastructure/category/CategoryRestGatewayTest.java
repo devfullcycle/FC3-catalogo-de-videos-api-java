@@ -23,7 +23,7 @@ import static org.mockito.Mockito.doReturn;
 public class CategoryRestGatewayTest extends AbstractRestClientTest {
 
     @Autowired
-    private CategoryRestGateway target;
+    private CategoryRestClient target;
 
     @SpyBean
     private ClientCredentialsManager credentialsManager;
