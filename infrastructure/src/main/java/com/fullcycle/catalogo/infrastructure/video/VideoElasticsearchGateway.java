@@ -1,8 +1,5 @@
 package com.fullcycle.catalogo.infrastructure.video;
 
-import co.elastic.clients.elasticsearch._types.FieldValue;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
 import com.fullcycle.catalogo.domain.video.Video;
 import com.fullcycle.catalogo.domain.video.VideoGateway;
@@ -18,9 +15,10 @@ import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchOperations;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Optional;
 
-import static org.springframework.util.CollectionUtils.isEmpty;
+import static com.fullcycle.catalogo.infrastructure.video.VideoQueryBuilder.*;
 
 @Component
 @Profile("!development")
@@ -67,35 +65,18 @@ public class VideoElasticsearchGateway implements VideoGateway {
         final var currentPage = aQuery.page();
         final var itemsPerPage = aQuery.perPage();
 
-        final List<Query> must = new ArrayList<>();
-        must.add(QueryBuilders.term(t -> t.field("published").value(true)));
-
-        if (!isEmpty(aQuery.castMembers())) {
-            must.add(QueryBuilders.terms(t -> t.field("cast_members").terms(it -> it.value(fieldValues(aQuery.castMembers())))));
-        }
-
-        if (!isEmpty(aQuery.categories())) {
-            must.add(QueryBuilders.terms(t -> t.field("categories").terms(it -> it.value(fieldValues(aQuery.categories())))));
-        }
-
-        if (!isEmpty(aQuery.genres())) {
-            must.add(QueryBuilders.terms(t -> t.field("genres").terms(it -> it.value(fieldValues(aQuery.genres())))));
-        }
-
-        if (aQuery.launchedAt() != null) {
-            must.add(QueryBuilders.term(t -> t.field("launched_at").value(aQuery.launchedAt())));
-        }
-
-        if (aQuery.rating() != null && !aQuery.rating().isBlank()) {
-            must.add(QueryBuilders.term(t -> t.field("rating").value(aQuery.rating())));
-        }
-
-        if (aQuery.terms() != null && !aQuery.terms().isBlank()) {
-            must.add(QueryBuilders.queryString(q -> q.fields("title", "description").query("*" + aQuery.terms() + "*")));
-        }
+        final var aQueryBuilder = new VideoQueryBuilder(
+                onlyPublished(),
+                containingCastMembers(aQuery.castMembers()),
+                containingCategories(aQuery.categories()),
+                containingGenres(aQuery.genres()),
+                launchedAtEquals(aQuery.launchedAt()),
+                ratingEquals(aQuery.rating()),
+                titleOrDescriptionContaining(aQuery.terms())
+        );
 
         final var query = NativeQuery.builder()
-                .withQuery(QueryBuilders.bool(b -> b.must(must)))
+                .withQuery(aQueryBuilder.build())
                 .withPageable(PageRequest.of(currentPage, itemsPerPage, Sort.by(Direction.fromString(aQuery.direction()), buildSort(aQuery.sort()))))
                 .build();
 
@@ -107,12 +88,6 @@ public class VideoElasticsearchGateway implements VideoGateway {
                 .toList();
 
         return new Pagination<>(currentPage, itemsPerPage, total, videos);
-    }
-
-    private List<FieldValue> fieldValues(final Set<String> ids) {
-        return ids.stream()
-                .map(FieldValue::of)
-                .toList();
     }
 
     private String buildSort(final String sort) {
