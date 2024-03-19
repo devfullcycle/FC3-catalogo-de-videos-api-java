@@ -7,8 +7,10 @@ import com.fullcycle.catalogo.infrastructure.configuration.json.Json;
 import com.fullcycle.catalogo.infrastructure.kafka.models.connect.MessageValue;
 import com.fullcycle.catalogo.infrastructure.kafka.models.connect.Operation;
 import com.fullcycle.catalogo.infrastructure.video.VideoClient;
+import com.fullcycle.catalogo.infrastructure.video.models.ImageResourceDTO;
 import com.fullcycle.catalogo.infrastructure.video.models.VideoDTO;
 import com.fullcycle.catalogo.infrastructure.video.models.VideoEvent;
+import com.fullcycle.catalogo.infrastructure.video.models.VideoResourceDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.DltHandler;
@@ -91,11 +93,11 @@ public class VideoListener {
                 dto.published(),
                 dto.createdAt(),
                 dto.updatedAt(),
-                dto.video(),
-                dto.trailer(),
-                dto.banner(),
-                dto.thumbnail(),
-                dto.thumbnailHalf(),
+                dto.getVideo().map(VideoResourceDTO::encodedLocation).orElse(""),
+                dto.getTrailer().map(VideoResourceDTO::encodedLocation).orElse(""),
+                dto.getBanner().map(ImageResourceDTO::location).orElse(""),
+                dto.getThumbnail().map(ImageResourceDTO::location).orElse(""),
+                dto.getThumbnailHalf().map(ImageResourceDTO::location).orElse(""),
                 dto.categoriesId(),
                 dto.castMembersId(),
                 dto.genresId()

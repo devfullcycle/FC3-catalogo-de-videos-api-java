@@ -4,13 +4,17 @@ import com.fullcycle.catalogo.AbstractEmbeddedKafkaTest;
 import com.fullcycle.catalogo.application.video.delete.DeleteVideoUseCase;
 import com.fullcycle.catalogo.application.video.save.SaveVideoUseCase;
 import com.fullcycle.catalogo.domain.Fixture;
+import com.fullcycle.catalogo.domain.utils.IdUtils;
+import com.fullcycle.catalogo.domain.video.Video;
 import com.fullcycle.catalogo.infrastructure.configuration.json.Json;
 import com.fullcycle.catalogo.infrastructure.kafka.models.connect.MessageValue;
 import com.fullcycle.catalogo.infrastructure.kafka.models.connect.Operation;
 import com.fullcycle.catalogo.infrastructure.kafka.models.connect.ValuePayload;
 import com.fullcycle.catalogo.infrastructure.video.VideoClient;
+import com.fullcycle.catalogo.infrastructure.video.models.ImageResourceDTO;
 import com.fullcycle.catalogo.infrastructure.video.models.VideoDTO;
 import com.fullcycle.catalogo.infrastructure.video.models.VideoEvent;
+import com.fullcycle.catalogo.infrastructure.video.models.VideoResourceDTO;
 import org.apache.kafka.clients.admin.TopicListing;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.Assertions;
@@ -137,7 +141,7 @@ class VideoListenerTest extends AbstractEmbeddedKafkaTest {
             return new SaveVideoUseCase.Output(golang.id());
         }).when(saveVideoUseCase).execute(any());
 
-        doReturn(Optional.of(VideoDTO.from(golang))).when(videoClient).videoOfId(any());
+        doReturn(Optional.of(videoDto(golang))).when(videoClient).videoOfId(any());
 
         // when
         producer().send(new ProducerRecord<>(videoTopics, message)).get(10, TimeUnit.SECONDS);
@@ -185,7 +189,7 @@ class VideoListenerTest extends AbstractEmbeddedKafkaTest {
             return new SaveVideoUseCase.Output(golang.id());
         }).when(saveVideoUseCase).execute(any());
 
-        doReturn(Optional.of(VideoDTO.from(golang))).when(videoClient).videoOfId(any());
+        doReturn(Optional.of(videoDto(golang))).when(videoClient).videoOfId(any());
 
         // when
         producer().send(new ProducerRecord<>(videoTopics, message)).get(10, TimeUnit.SECONDS);
@@ -240,5 +244,36 @@ class VideoListenerTest extends AbstractEmbeddedKafkaTest {
 
         // then
         verify(deleteVideoUseCase, times(1)).execute(eq(new DeleteVideoUseCase.Input(golang.id())));
+    }
+
+    private static VideoDTO videoDto(final Video aVideo) {
+        return new VideoDTO(
+                aVideo.id(),
+                aVideo.title(),
+                aVideo.description(),
+                aVideo.launchedAt().getValue(),
+                aVideo.rating().getName(),
+                aVideo.duration(),
+                aVideo.opened(),
+                aVideo.published(),
+                videoResourceDTO(aVideo.video()),
+                videoResourceDTO(aVideo.trailer()),
+                imageResourceDTO(aVideo.banner()),
+                imageResourceDTO(aVideo.thumbnail()),
+                imageResourceDTO(aVideo.thumbnailHalf()),
+                aVideo.categories(),
+                aVideo.castMembers(),
+                aVideo.genres(),
+                aVideo.createdAt().toString(),
+                aVideo.updatedAt().toString()
+        );
+    }
+
+    private static VideoResourceDTO videoResourceDTO(final String data) {
+        return new VideoResourceDTO(IdUtils.uniqueId(), IdUtils.uniqueId(), data, data, data, "processed");
+    }
+
+    private static ImageResourceDTO imageResourceDTO(final String data) {
+        return new ImageResourceDTO(IdUtils.uniqueId(), IdUtils.uniqueId(), data, data);
     }
 }
