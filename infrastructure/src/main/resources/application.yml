@@ -37,6 +37,13 @@ kafka:
       topics: adm_videos_mysql.adm_videos.genres
       group-id: catalogo-service
       max-attempts: 4
+    videos:
+      auto-offset-reset: earliest
+      concurrency: 1
+      id: kafka-listener-videos
+      topics: adm_videos_mysql.adm_videos.videos
+      group-id: catalogo-service
+      max-attempts: 4
 
 keycloak:
   token-uri: /protocol/openid-connect/token

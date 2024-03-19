@@ -1,5 +1,7 @@
 package com.fullcycle.catalogo.infrastructure.video.models;
 
+import com.fullcycle.catalogo.domain.video.Video;
+
 import java.util.Set;
 
 public record VideoDTO(
@@ -22,4 +24,26 @@ public record VideoDTO(
         String createdAt,
         String updatedAt
 ) {
+    public static VideoDTO from(final Video aVideo) {
+        return new VideoDTO(
+                aVideo.id(),
+                aVideo.title(),
+                aVideo.description(),
+                aVideo.launchedAt().getValue(),
+                aVideo.rating().getName(),
+                aVideo.duration(),
+                aVideo.opened(),
+                aVideo.published(),
+                aVideo.video(),
+                aVideo.trailer(),
+                aVideo.banner(),
+                aVideo.thumbnail(),
+                aVideo.thumbnailHalf(),
+                aVideo.categories(),
+                aVideo.castMembers(),
+                aVideo.genres(),
+                aVideo.createdAt().toString(),
+                aVideo.updatedAt().toString()
+        );
+    }
 }
