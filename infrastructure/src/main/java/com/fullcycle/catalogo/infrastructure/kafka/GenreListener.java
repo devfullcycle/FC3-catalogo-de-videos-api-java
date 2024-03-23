@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fullcycle.catalogo.application.genre.delete.DeleteGenreUseCase;
 import com.fullcycle.catalogo.application.genre.save.SaveGenreUseCase;
 import com.fullcycle.catalogo.infrastructure.configuration.json.Json;
-import com.fullcycle.catalogo.infrastructure.genre.GenreGateway;
+import com.fullcycle.catalogo.infrastructure.genre.GenreClient;
 import com.fullcycle.catalogo.infrastructure.genre.models.GenreEvent;
 import com.fullcycle.catalogo.infrastructure.kafka.models.connect.MessageValue;
 import com.fullcycle.catalogo.infrastructure.kafka.models.connect.Operation;
@@ -28,16 +28,16 @@ public class GenreListener {
     private static final TypeReference<MessageValue<GenreEvent>> GENRE_MESSAGE_TYPE = new TypeReference<>() {
     };
 
-    private final GenreGateway genreGateway;
+    private final GenreClient genreClient;
     private final SaveGenreUseCase saveGenreUseCase;
     private final DeleteGenreUseCase deleteGenreUseCase;
 
     public GenreListener(
-            final GenreGateway genreGateway,
+            final GenreClient genreClient,
             final SaveGenreUseCase saveGenreUseCase,
             final DeleteGenreUseCase deleteGenreUseCase
     ) {
-        this.genreGateway = Objects.requireNonNull(genreGateway);
+        this.genreClient = Objects.requireNonNull(genreClient);
         this.saveGenreUseCase = Objects.requireNonNull(saveGenreUseCase);
         this.deleteGenreUseCase = Objects.requireNonNull(deleteGenreUseCase);
     }
@@ -65,7 +65,7 @@ public class GenreListener {
         if (Operation.isDelete(op)) {
             this.deleteGenreUseCase.execute(new DeleteGenreUseCase.Input(messagePayload.before().id()));
         } else {
-            this.genreGateway.genreOfId(messagePayload.after().id())
+            this.genreClient.genreOfId(messagePayload.after().id())
                     .map(it -> new SaveGenreUseCase.Input(it.id(), it.name(), it.isActive(), it.categoriesId(), it.createdAt(), it.updatedAt(), it.deletedAt()))
                     .ifPresentOrElse(this.saveGenreUseCase::execute, () -> {
                         LOG.warn("Genre was not found {}", messagePayload.after().id());

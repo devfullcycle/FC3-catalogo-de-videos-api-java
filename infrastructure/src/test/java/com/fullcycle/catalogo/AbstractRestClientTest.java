@@ -2,9 +2,10 @@ package com.fullcycle.catalogo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fullcycle.catalogo.infrastructure.category.CategoryRestGateway;
+import com.fullcycle.catalogo.infrastructure.category.CategoryRestClient;
 import com.fullcycle.catalogo.infrastructure.configuration.WebServerConfig;
-import com.fullcycle.catalogo.infrastructure.genre.GenreRestGateway;
+import com.fullcycle.catalogo.infrastructure.genre.GenreRestClient;
+import com.fullcycle.catalogo.infrastructure.video.VideoRestClient;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -34,8 +35,9 @@ import java.util.List;
 @Tag("integrationTest")
 public abstract class AbstractRestClientTest {
 
-    protected static final String CATEGORY = CategoryRestGateway.NAMESPACE;
-    protected static final String GENRE = GenreRestGateway.NAMESPACE;
+    protected static final String CATEGORY = CategoryRestClient.NAMESPACE;
+    protected static final String GENRE = GenreRestClient.NAMESPACE;
+    protected static final String VIDEO = VideoRestClient.NAMESPACE;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -54,7 +56,7 @@ public abstract class AbstractRestClientTest {
         WireMock.reset();
         WireMock.resetAllRequests();
         resetAllCaches();
-        List.of(CATEGORY, GENRE).forEach(this::resetFaultTolerance);
+        List.of(CATEGORY, GENRE, VIDEO).forEach(this::resetFaultTolerance);
     }
 
     protected Cache cache(final String name) {

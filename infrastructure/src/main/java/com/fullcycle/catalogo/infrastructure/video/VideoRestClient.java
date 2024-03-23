@@ -1,9 +1,9 @@
-package com.fullcycle.catalogo.infrastructure.genre;
+package com.fullcycle.catalogo.infrastructure.video;
 
 import com.fullcycle.catalogo.infrastructure.authentication.GetClientCredentials;
-import com.fullcycle.catalogo.infrastructure.configuration.annotations.Genres;
-import com.fullcycle.catalogo.infrastructure.genre.models.GenreDTO;
+import com.fullcycle.catalogo.infrastructure.configuration.annotations.Videos;
 import com.fullcycle.catalogo.infrastructure.utils.HttpClient;
+import com.fullcycle.catalogo.infrastructure.video.models.VideoDTO;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -16,34 +16,34 @@ import org.springframework.web.client.RestClient;
 import java.util.Optional;
 
 @Component
-@CacheConfig(cacheNames = "admin-genres")
-public class GenreRestGateway implements GenreGateway, HttpClient {
+@CacheConfig(cacheNames = "admin-videos")
+public class VideoRestClient implements VideoClient, HttpClient {
 
-    public static final String NAMESPACE = "genres";
+    public static final String NAMESPACE = "videos";
 
     private final RestClient restClient;
     private final GetClientCredentials getClientCredentials;
 
-    public GenreRestGateway(@Genres final RestClient restClient, final GetClientCredentials getClientCredentials) {
+    public VideoRestClient(@Videos final RestClient restClient, final GetClientCredentials getClientCredentials) {
         this.restClient = restClient;
         this.getClientCredentials = getClientCredentials;
     }
 
     @Override
-    @Cacheable(key = "#genreId")
+    @Cacheable(key = "#videoId")
     @Bulkhead(name = NAMESPACE)
     @CircuitBreaker(name = NAMESPACE)
     @Retry(name = NAMESPACE)
-    public Optional<GenreDTO> genreOfId(String genreId) {
+    public Optional<VideoDTO> videoOfId(String videoId) {
         final var token = this.getClientCredentials.retrieve();
-        return doGet(genreId, () ->
+        return doGet(videoId, () ->
                 this.restClient.get()
-                        .uri("/{id}", genreId)
+                        .uri("/{id}", videoId)
                         .header(HttpHeaders.AUTHORIZATION, "bearer " + token)
                         .retrieve()
-                        .onStatus(isNotFound, notFoundHandler(genreId))
-                        .onStatus(is5xx, a5xxHandler(genreId))
-                        .body(GenreDTO.class)
+                        .onStatus(isNotFound, notFoundHandler(videoId))
+                        .onStatus(is5xx, a5xxHandler(videoId))
+                        .body(VideoDTO.class)
         );
     }
 

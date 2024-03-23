@@ -3,7 +3,7 @@ package com.fullcycle.catalogo.infrastructure.kafka;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fullcycle.catalogo.application.category.delete.DeleteCategoryUseCase;
 import com.fullcycle.catalogo.application.category.save.SaveCategoryUseCase;
-import com.fullcycle.catalogo.infrastructure.category.CategoryGateway;
+import com.fullcycle.catalogo.infrastructure.category.CategoryClient;
 import com.fullcycle.catalogo.infrastructure.category.models.CategoryEvent;
 import com.fullcycle.catalogo.infrastructure.configuration.json.Json;
 import com.fullcycle.catalogo.infrastructure.kafka.models.connect.MessageValue;
@@ -28,16 +28,16 @@ public class CategoryListener {
     public static final TypeReference<MessageValue<CategoryEvent>> CATEGORY_MESSAGE = new TypeReference<>() {
     };
 
-    private final CategoryGateway categoryGateway;
+    private final CategoryClient categoryClient;
     private final SaveCategoryUseCase saveCategoryUseCase;
     private final DeleteCategoryUseCase deleteCategoryUseCase;
 
     public CategoryListener(
-            final CategoryGateway categoryGateway,
+            final CategoryClient categoryClient,
             final SaveCategoryUseCase saveCategoryUseCase,
             final DeleteCategoryUseCase deleteCategoryUseCase
     ) {
-        this.categoryGateway = Objects.requireNonNull(categoryGateway);
+        this.categoryClient = Objects.requireNonNull(categoryClient);
         this.saveCategoryUseCase = Objects.requireNonNull(saveCategoryUseCase);
         this.deleteCategoryUseCase = Objects.requireNonNull(deleteCategoryUseCase);
     }
@@ -65,7 +65,7 @@ public class CategoryListener {
         if (Operation.isDelete(op)) {
             this.deleteCategoryUseCase.execute(messagePayload.before().id());
         } else {
-            this.categoryGateway.categoryOfId(messagePayload.after().id())
+            this.categoryClient.categoryOfId(messagePayload.after().id())
                     .ifPresentOrElse(this.saveCategoryUseCase::execute, () -> {
                         LOG.warn("Category was not found {}", messagePayload.after().id());
                     });
@@ -81,7 +81,7 @@ public class CategoryListener {
         if (Operation.isDelete(op)) {
             this.deleteCategoryUseCase.execute(messagePayload.before().id());
         } else {
-            this.categoryGateway.categoryOfId(messagePayload.after().id())
+            this.categoryClient.categoryOfId(messagePayload.after().id())
                     .ifPresentOrElse(this.saveCategoryUseCase::execute, () -> {
                         LOG.warn("Category was not found {}", messagePayload.after().id());
                     });
