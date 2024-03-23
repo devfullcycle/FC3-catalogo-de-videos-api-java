@@ -9,6 +9,7 @@ import com.fullcycle.catalogo.infrastructure.castmember.models.CastMemberDTO;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class CastMemberGraphQLController {
     }
 
     @QueryMapping
+    @Secured({"ROLE_ADMIN", "ROLE_SUBSCRIBER"})
     public List<ListCastMembersOutput> castMembers(
             @Argument final String search,
             @Argument final int page,
@@ -43,6 +45,7 @@ public class CastMemberGraphQLController {
     }
 
     @MutationMapping
+    @Secured({"ROLE_ADMIN"})
     public CastMember saveCastMember(@Argument CastMemberDTO input) {
         return this.saveCastMemberUseCase.execute(input.toCastMember());
     }

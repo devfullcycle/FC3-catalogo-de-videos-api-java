@@ -9,6 +9,7 @@ import com.fullcycle.catalogo.infrastructure.category.models.CategoryInput;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class CategoryGraphQLController {
     }
 
     @QueryMapping
+    @Secured({"ROLE_ADMIN", "ROLE_SUBSCRIBER"})
     public List<ListCategoryOutput> categories(
             @Argument final String search,
             @Argument final int page,
@@ -44,6 +46,7 @@ public class CategoryGraphQLController {
     }
 
     @MutationMapping
+    @Secured({"ROLE_ADMIN", "ROLE_CATALOGO_CATEGORIA"})
     public Category saveCategory(@Argument final CategoryInput input) {
         return this.saveCategoryUseCase.execute(input.toCategory());
     }

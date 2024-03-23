@@ -8,6 +8,7 @@ import com.fullcycle.catalogo.domain.category.CategoryGateway;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class VideoGraphQLController {
     }
 
     @QueryMapping
+    @Secured({"ROLE_ADMIN", "ROLE_SUBSCRIBER"})
     public List<ListVideoUseCase.Output> videos(
             @Argument final String search,
             @Argument final int page,
@@ -51,11 +53,13 @@ public class VideoGraphQLController {
     }
 
     @QueryMapping
+    @Secured({"ROLE_ADMIN", "ROLE_SUBSCRIBER"})
     public GetVideoUseCase.Output videoOfId(@Argument String videoId) {
         return getVideoUseCase.execute(new GetVideoUseCase.Input(videoId)).orElse(null);
     }
 
     @SchemaMapping(typeName = "Video", field = "categories")
+    @Secured({"ROLE_ADMIN", "ROLE_SUBSCRIBER"})
     public List<ListCategoryOutput> categories(GetVideoUseCase.Output video) {
         return video.categories()
                 .stream()

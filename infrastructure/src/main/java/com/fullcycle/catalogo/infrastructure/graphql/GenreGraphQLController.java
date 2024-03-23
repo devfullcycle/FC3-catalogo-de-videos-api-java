@@ -7,6 +7,7 @@ import com.fullcycle.catalogo.infrastructure.genre.models.GenreInput;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class GenreGraphQLController {
     }
 
     @QueryMapping
+    @Secured({"ROLE_ADMIN", "ROLE_SUBSCRIBER"})
     public List<ListGenreUseCase.Output> genres(
             @Argument final String search,
             @Argument final int page,
@@ -38,6 +40,7 @@ public class GenreGraphQLController {
     }
 
     @MutationMapping
+    @Secured({"ROLE_ADMIN"})
     public SaveGenreUseCase.Output saveGenre(@Argument(name = "input") final GenreInput arg) {
         final var input =
                 new SaveGenreUseCase.Input(arg.id(), arg.name(), arg.active(), arg.categories(), arg.createdAt(), arg.updatedAt(), arg.deletedAt());
