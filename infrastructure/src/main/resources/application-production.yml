@@ -13,5 +13,6 @@ keycloak:
   realm: ${KEYCLOAK_REALM}
 
 rest-client:
+  base-url: ${BASE_URL}
   keycloak:
     read-timeout: 1_000
