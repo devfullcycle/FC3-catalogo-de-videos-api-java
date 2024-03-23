@@ -6,6 +6,9 @@ elasticsearch:
   username: elastic
   password: elastic
 
+kafka:
+  bootstrap-servers: localhost:9092
+
 keycloak:
   client-id: fc3-app
   client-secret: seecret
