@@ -25,7 +25,7 @@ rest-client:
   videos:
     read-timeout: 300
   keycloak:
-    read-timeout: 300
+    read-timeout: 1000
 
 resilience4j.bulkhead:
   configs:
