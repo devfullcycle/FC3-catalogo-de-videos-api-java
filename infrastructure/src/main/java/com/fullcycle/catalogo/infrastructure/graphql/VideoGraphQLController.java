@@ -18,6 +18,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -48,6 +49,8 @@ public class VideoGraphQLController {
     }
 
     @QueryMapping
+//    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUBSCRIBER')")
+    @Secured({"ROLE_ADMIN", "ROLE_SUBSCRIBER"})
     public List<GqlVideo> videos(
             @Argument final String search,
             @Argument final int page,
@@ -67,6 +70,7 @@ public class VideoGraphQLController {
     }
 
     @SchemaMapping(typeName = "Video", field = "castMembers")
+    @Secured({"ROLE_ADMIN", "ROLE_SUBSCRIBER"})
     public List<GqlCastMember> castMembers(final GqlVideo video) {
         return this.getAllCastMembersByIdUseCase.execute(new GetAllCastMembersByIdUseCase.Input(video.castMembersId())).stream()
                 .map(GqlCastMemberPresenter::present)
@@ -74,6 +78,7 @@ public class VideoGraphQLController {
     }
 
     @SchemaMapping(typeName = "Video", field = "categories")
+    @Secured({"ROLE_ADMIN", "ROLE_SUBSCRIBER"})
     public List<GqlCategory> categories(final GqlVideo video) {
         return this.getAllCategoriesByIdUseCase.execute(new GetAllCategoriesByIdUseCase.Input(video.categoriesId())).stream()
                 .map(GqlCategoryPresenter::present)
@@ -81,6 +86,7 @@ public class VideoGraphQLController {
     }
 
     @SchemaMapping(typeName = "Video", field = "genres")
+    @Secured({"ROLE_ADMIN", "ROLE_SUBSCRIBER"})
     public List<GqlGenre> genres(final GqlVideo video) {
         return this.getAllGenresByIdUseCase.execute(new GetAllGenresByIdUseCase.Input(video.genresId())).stream()
                 .map(GqlGenrePresenter::present)
@@ -88,6 +94,7 @@ public class VideoGraphQLController {
     }
 
     @MutationMapping
+    @Secured({"ROLE_ADMIN", "ROLE_CATALOGO_VIDEOS"})
     public SaveVideoUseCase.Output saveVideo(@Argument(name = "input") final GqlVideoInput arg) {
         final var input = new SaveVideoUseCase.Input(
                 arg.id(), arg.title(), arg.description(), arg.yearLaunched(), arg.duration(),
