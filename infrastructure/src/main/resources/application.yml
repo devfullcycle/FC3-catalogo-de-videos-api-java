@@ -87,6 +87,8 @@ spring:
   graphql:
     graphiql:
       enabled: ${graphql.graphiql}
+  kafka:
+    bootstrap-servers: ${kafka.bootstrap-servers}
   servlet:
     multipart:
       max-file-size: 10GB # Max file size.
