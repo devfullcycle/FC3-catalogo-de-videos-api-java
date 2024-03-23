@@ -132,11 +132,11 @@ public final class Fixture {
                     IdUtils.uniqueId(),
                     "System Design no Mercado Livre na prática",
                     "O vídeo mais assistido",
-                    Fixture.year(),
+                    2022,
                     Fixture.duration(),
-                    rating().getName(),
-                    Fixture.bool(),
-                    Fixture.bool(),
+                    Rating.AGE_16.getName(),
+                    true,
+                    true,
                     InstantUtils.now().toString(),
                     InstantUtils.now().toString(),
                     "http://video",
@@ -144,9 +144,9 @@ public final class Fixture {
                     "http://banner",
                     "http://thumb",
                     "http://thumbhalf",
-                    Set.of(IdUtils.uniqueId()),
-                    Set.of(IdUtils.uniqueId()),
-                    Set.of(IdUtils.uniqueId())
+                    Set.of("aulas"),
+                    Set.of("luiz"),
+                    Set.of("systemdesign")
             );
         }
 
@@ -154,12 +154,12 @@ public final class Fixture {
             return Video.with(
                     IdUtils.uniqueId(),
                     "Java 21",
-                    "O vídeo mais assistido",
-                    Fixture.year(),
+                    "Java FTW",
+                    2023,
                     Fixture.duration(),
-                    rating().getName(),
-                    Fixture.bool(),
-                    Fixture.bool(),
+                    Rating.AGE_10.getName(),
+                    true,
+                    true,
                     InstantUtils.now().toString(),
                     InstantUtils.now().toString(),
                     "http://video",
@@ -167,9 +167,32 @@ public final class Fixture {
                     "http://banner",
                     "http://thumb",
                     "http://thumbhalf",
-                    Set.of(IdUtils.uniqueId()),
-                    Set.of(IdUtils.uniqueId()),
-                    Set.of(IdUtils.uniqueId())
+                    Set.of("lives"),
+                    Set.of("gabriel"),
+                    Set.of("java")
+            );
+        }
+
+        public static Video golang() {
+            return Video.with(
+                    IdUtils.uniqueId(),
+                    "Golang 1.22",
+                    "Um vídeo da linguagem go",
+                    2024,
+                    Fixture.duration(),
+                    Rating.L.getName(),
+                    true,
+                    true,
+                    InstantUtils.now().toString(),
+                    InstantUtils.now().toString(),
+                    "http://video",
+                    "http://trailer",
+                    "http://banner",
+                    "http://thumb",
+                    "http://thumbhalf",
+                    Set.of("meeting"),
+                    Set.of("wesley"),
+                    Set.of("golang")
             );
         }
     }
