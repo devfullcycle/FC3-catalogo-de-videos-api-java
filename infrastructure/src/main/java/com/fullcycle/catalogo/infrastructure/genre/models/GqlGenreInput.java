@@ -5,7 +5,7 @@ import com.fullcycle.catalogo.domain.genre.Genre;
 import java.time.Instant;
 import java.util.Set;
 
-public record GenreInput(
+public record GqlGenreInput(
         String id,
         String name,
         Boolean active,
@@ -14,8 +14,8 @@ public record GenreInput(
         Instant updatedAt,
         Instant deletedAt
 ) {
-    public static GenreInput from(final Genre genre) {
-        return new GenreInput(
+    public static GqlGenreInput from(final Genre genre) {
+        return new GqlGenreInput(
                 genre.id(),
                 genre.name(),
                 genre.active(),

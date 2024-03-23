@@ -4,10 +4,11 @@ import com.fullcycle.catalogo.domain.category.Category;
 
 public record ListCategoryOutput(
         String id,
-        String name
+        String name,
+        String description
 ) {
 
     public static ListCategoryOutput from(final Category aCategory) {
-        return new ListCategoryOutput(aCategory.id(), aCategory.name());
+        return new ListCategoryOutput(aCategory.id(), aCategory.name(), aCategory.description());
     }
 }

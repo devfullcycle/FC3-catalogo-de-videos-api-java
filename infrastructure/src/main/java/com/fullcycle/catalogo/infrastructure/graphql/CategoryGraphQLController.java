@@ -1,11 +1,11 @@
 package com.fullcycle.catalogo.infrastructure.graphql;
 
-import com.fullcycle.catalogo.application.category.list.ListCategoryOutput;
 import com.fullcycle.catalogo.application.category.list.ListCategoryUseCase;
 import com.fullcycle.catalogo.application.category.save.SaveCategoryUseCase;
-import com.fullcycle.catalogo.domain.category.Category;
 import com.fullcycle.catalogo.domain.category.CategorySearchQuery;
-import com.fullcycle.catalogo.infrastructure.category.models.CategoryInput;
+import com.fullcycle.catalogo.infrastructure.category.GqlCategoryPresenter;
+import com.fullcycle.catalogo.infrastructure.category.models.GqlCategoryInput;
+import com.fullcycle.catalogo.infrastructure.category.models.GqlCategory;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -29,7 +29,7 @@ public class CategoryGraphQLController {
     }
 
     @QueryMapping
-    public List<ListCategoryOutput> categories(
+    public List<GqlCategory> categories(
             @Argument final String search,
             @Argument final int page,
             @Argument final int perPage,
@@ -40,11 +40,13 @@ public class CategoryGraphQLController {
         final var aQuery =
                 new CategorySearchQuery(page, perPage, search, sort, direction);
 
-        return this.listCategoryUseCase.execute(aQuery).data();
+        return this.listCategoryUseCase.execute(aQuery)
+                .map(GqlCategoryPresenter::present)
+                .data();
     }
 
     @MutationMapping
-    public Category saveCategory(@Argument final CategoryInput input) {
-        return this.saveCategoryUseCase.execute(input.toCategory());
+    public GqlCategory saveCategory(@Argument final GqlCategoryInput input) {
+        return GqlCategoryPresenter.present(this.saveCategoryUseCase.execute(input.toCategory()));
     }
 }

@@ -1,8 +1,8 @@
-package com.fullcycle.catalogo.infrastructure.genre;
+package com.fullcycle.catalogo.infrastructure.category;
 
-import com.fullcycle.catalogo.domain.genre.Genre;
-import com.fullcycle.catalogo.domain.genre.GenreGateway;
-import com.fullcycle.catalogo.domain.genre.GenreSearchQuery;
+import com.fullcycle.catalogo.domain.category.Category;
+import com.fullcycle.catalogo.domain.category.CategoryGateway;
+import com.fullcycle.catalogo.domain.category.CategorySearchQuery;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -15,18 +15,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Profile("development")
-public class GenreInMemoryGateway implements GenreGateway {
+public class CategoryInMemoryGateway implements CategoryGateway {
 
-    private final Map<String, Genre> db;
+    private final Map<String, Category> db;
 
-    public GenreInMemoryGateway() {
+    public CategoryInMemoryGateway() {
         this.db = new ConcurrentHashMap<>();
     }
 
     @Override
-    public Genre save(final Genre aGenre) {
-        this.db.put(aGenre.id(), aGenre);
-        return aGenre;
+    public Category save(final Category aCategory) {
+        this.db.put(aCategory.id(), aCategory);
+        return aCategory;
     }
 
     @Override
@@ -35,12 +35,12 @@ public class GenreInMemoryGateway implements GenreGateway {
     }
 
     @Override
-    public Optional<Genre> findById(String genreId) {
+    public Optional<Category> findById(String genreId) {
         return Optional.ofNullable(this.db.get(genreId));
     }
 
     @Override
-    public List<Genre> findAllById(Set<String> genreId) {
+    public List<Category> findAllById(Set<String> genreId) {
         if (genreId == null || genreId.isEmpty()) {
             return List.of();
         }
@@ -50,7 +50,7 @@ public class GenreInMemoryGateway implements GenreGateway {
     }
 
     @Override
-    public Pagination<Genre> findAll(GenreSearchQuery aQuery) {
+    public Pagination<Category> findAll(CategorySearchQuery aQuery) {
         return new Pagination<>(
                 aQuery.page(),
                 aQuery.perPage(),

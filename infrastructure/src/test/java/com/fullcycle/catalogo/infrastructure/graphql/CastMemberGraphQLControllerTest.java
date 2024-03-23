@@ -11,6 +11,8 @@ import com.fullcycle.catalogo.domain.castmember.CastMemberType;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
 import com.fullcycle.catalogo.domain.utils.IdUtils;
 import com.fullcycle.catalogo.domain.utils.InstantUtils;
+import com.fullcycle.catalogo.infrastructure.castmember.GqlCastMemberPresenter;
+import com.fullcycle.catalogo.infrastructure.castmember.models.GqlCastMember;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -41,10 +43,12 @@ public class CastMemberGraphQLControllerTest {
     @Test
     public void givenDefaultArgumentsWhenCallsListCastMembersShouldReturn() {
         // given
-        final var expectedMembers = List.of(
+        final var castMembers = List.of(
                 ListCastMembersOutput.from(Fixture.CastMembers.gabriel()),
                 ListCastMembersOutput.from(Fixture.CastMembers.wesley())
         );
+
+        final var expectedMembers = castMembers.stream().map(GqlCastMemberPresenter::present).toList();
 
         final var expectedPage = 0;
         final var expectedPerPage = 10;
@@ -53,7 +57,7 @@ public class CastMemberGraphQLControllerTest {
         final var expectedSearch = "";
 
         when(this.listCastMemberUseCase.execute(any()))
-                .thenReturn(new Pagination<>(expectedPage, expectedPerPage, expectedMembers.size(), expectedMembers));
+                .thenReturn(new Pagination<>(expectedPage, expectedPerPage, castMembers.size(), castMembers));
 
         final var query = """
                 {
@@ -71,7 +75,7 @@ public class CastMemberGraphQLControllerTest {
         final var res = this.graphql.document(query).execute();
 
         final var actualCategories = res.path("castMembers")
-                .entityList(ListCastMembersOutput.class)
+                .entityList(GqlCastMember.class)
                 .get();
 
         // then
@@ -95,10 +99,12 @@ public class CastMemberGraphQLControllerTest {
     @Test
     public void givenCustomArgumentsWhenCallsListCastMembersShouldReturn() {
         // given
-        final var expectedMembers = List.of(
+        final var castMembers = List.of(
                 ListCastMembersOutput.from(Fixture.CastMembers.gabriel()),
                 ListCastMembersOutput.from(Fixture.CastMembers.wesley())
         );
+
+        final var expectedMembers = castMembers.stream().map(GqlCastMemberPresenter::present).toList();
 
         final var expectedPage = 2;
         final var expectedPerPage = 15;
@@ -107,7 +113,7 @@ public class CastMemberGraphQLControllerTest {
         final var expectedSearch = "asd";
 
         when(this.listCastMemberUseCase.execute(any()))
-                .thenReturn(new Pagination<>(expectedPage, expectedPerPage, expectedMembers.size(), expectedMembers));
+                .thenReturn(new Pagination<>(expectedPage, expectedPerPage, castMembers.size(), castMembers));
 
         final var query = """
                 query AllCastMembers($search: String, $page: Int, $perPage: Int, $sort: String, $direction: String) {
@@ -132,7 +138,7 @@ public class CastMemberGraphQLControllerTest {
                 .execute();
 
         final var actualCategories = res.path("castMembers")
-                .entityList(ListCastMembersOutput.class)
+                .entityList(GqlCastMember.class)
                 .get();
 
         // then

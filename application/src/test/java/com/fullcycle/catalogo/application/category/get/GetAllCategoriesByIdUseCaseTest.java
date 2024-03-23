@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class GetAllByIdUseCaseTest extends UseCaseTest {
+class GetAllCategoriesByIdUseCaseTest extends UseCaseTest {
 
     @InjectMocks
-    private GetAllByIdUseCase useCase;
+    private GetAllCategoriesByIdUseCase useCase;
 
     @Mock
     private CategoryGateway categoryGateway;
@@ -33,7 +33,7 @@ class GetAllByIdUseCaseTest extends UseCaseTest {
         );
 
         final var expectedItems = categories.stream()
-                .map(GetAllByIdUseCase.Output::new)
+                .map(GetAllCategoriesByIdUseCase.Output::new)
                 .toList();
 
         final var expectedIds = categories.stream().map(Category::id).collect(Collectors.toSet());
@@ -42,7 +42,7 @@ class GetAllByIdUseCaseTest extends UseCaseTest {
                 .thenReturn(categories);
 
         // when
-        final var actualOutput = this.useCase.execute(new GetAllByIdUseCase.Input(expectedIds));
+        final var actualOutput = this.useCase.execute(new GetAllCategoriesByIdUseCase.Input(expectedIds));
 
         // then
         Assertions.assertTrue(
@@ -59,7 +59,7 @@ class GetAllByIdUseCaseTest extends UseCaseTest {
         final Set<String> expectedIds = null;
 
         // when
-        final var actualOutput = this.useCase.execute(new GetAllByIdUseCase.Input(expectedIds));
+        final var actualOutput = this.useCase.execute(new GetAllCategoriesByIdUseCase.Input(expectedIds));
 
         // then
         Assertions.assertTrue(actualOutput.isEmpty());

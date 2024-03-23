@@ -7,6 +7,7 @@ import com.fullcycle.catalogo.domain.pagination.Pagination;
 import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberDocument;
 import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -24,6 +25,7 @@ import java.util.stream.StreamSupport;
 import static org.springframework.data.elasticsearch.core.query.Criteria.where;
 
 @Component
+@Profile("!development")
 public class CastMemberElasticsearchGateway implements CastMemberGateway {
 
     private static final String NAME_PROP = "name";
