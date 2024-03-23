@@ -57,7 +57,12 @@ public class GenreListener {
             attempts = "${kafka.consumers.genres.max-attempts}",
             topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE
     )
-    public void onMessage(@Payload final String payload, final ConsumerRecordMetadata metadata) {
+    public void onMessage(@Payload(required = false) final String payload, final ConsumerRecordMetadata metadata) {
+        if (payload == null) {
+            LOG.info("Message received from Kafka [topic:{}] [partition:{}] [offset:{}]: EMPTY", metadata.topic(), metadata.partition(), metadata.offset());
+            return;
+        }
+
         LOG.info("Message received from Kafka [topic:{}] [partition:{}] [offset:{}]: {}", metadata.topic(), metadata.partition(), metadata.offset(), payload);
         final var messagePayload = Json.readValue(payload, GENRE_MESSAGE_TYPE).payload();
         final var op = messagePayload.operation();

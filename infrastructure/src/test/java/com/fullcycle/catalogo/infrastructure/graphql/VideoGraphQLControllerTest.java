@@ -50,18 +50,21 @@ public class VideoGraphQLControllerTest {
     @Test
     public void givenDefaultArgumentsWhenCallsListVideosShouldReturn() {
         // given
+        final var java21 = Fixture.Videos.java21();
+        final var systemDesign = Fixture.Videos.systemDesign();
+
         final var categories = List.of(new GetAllCategoriesByIdUseCase.Output(Fixture.Categories.lives()));
         final var castMembers = List.of(new GetAllCastMembersByIdUseCase.Output(Fixture.CastMembers.gabriel()));
         final var genres = List.of(new GetAllGenresByIdUseCase.Output(Fixture.Genres.tech()));
 
         final var expectedVideos = List.of(
-                ListVideoUseCase.Output.from(Fixture.Videos.java21()),
-                ListVideoUseCase.Output.from(Fixture.Videos.systemDesign())
+                ListVideoUseCase.Output.from(java21),
+                ListVideoUseCase.Output.from(systemDesign)
         );
 
         final var expectedPage = 0;
         final var expectedPerPage = 10;
-        final var expectedSort = "name";
+        final var expectedSort = "title";
         final var expectedDirection = "asc";
         final var expectedSearch = "";
         final String expectedRating = null;
@@ -149,6 +152,15 @@ public class VideoGraphQLControllerTest {
         Assertions.assertEquals(expectedGenres, actualQuery.genres());
         Assertions.assertEquals(expectedYearLaunched, actualQuery.launchedAt());
         Assertions.assertEquals(expectedRating, actualQuery.rating());
+
+        verify(this.getAllCastMembersByIdUseCase, times(1)).execute(argThat(i -> i.ids().equals(java21.castMembers())));
+        verify(this.getAllCastMembersByIdUseCase, times(1)).execute(argThat(i -> i.ids().equals(systemDesign.castMembers())));
+
+        verify(this.getAllCategoriesByIdUseCase, times(1)).execute(argThat(i -> i.ids().equals(java21.categories())));
+        verify(this.getAllCategoriesByIdUseCase, times(1)).execute(argThat(i -> i.ids().equals(systemDesign.categories())));
+
+        verify(this.getAllGenresByIdUseCase, times(1)).execute(argThat(i -> i.ids().equals(java21.genres())));
+        verify(this.getAllGenresByIdUseCase, times(1)).execute(argThat(i -> i.ids().equals(systemDesign.genres())));
     }
 
     private static void compareVideoOutput(

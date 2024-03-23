@@ -82,7 +82,7 @@ public class VideoGraphQLController {
 
     @SchemaMapping(typeName = "Video", field = "genres")
     public List<GqlGenre> genres(final GqlVideo video) {
-        return this.getAllGenresByIdUseCase.execute(new GetAllGenresByIdUseCase.Input(video.castMembersId())).stream()
+        return this.getAllGenresByIdUseCase.execute(new GetAllGenresByIdUseCase.Input(video.genresId())).stream()
                 .map(GqlGenrePresenter::present)
                 .toList();
     }
