@@ -13,7 +13,6 @@ graphql:
 
 kafka:
   auto-create-topics: false
-  bootstrap-servers: localhost:9092
   pool-timeout: 1_000
   consumers:
     categories:

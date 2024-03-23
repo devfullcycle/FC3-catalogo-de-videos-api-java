@@ -6,6 +6,9 @@ elasticsearch:
 graphql:
   graphiql: true
 
+kafka:
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
 keycloak:
   client-id: ${KEYCLOAK_CLIENT_ID}
   client-secret: ${KEYCLOAK_CLIENT_SECRET}
