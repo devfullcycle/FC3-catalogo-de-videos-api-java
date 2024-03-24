@@ -23,4 +23,39 @@ public class IntegrationTestConfiguration {
     public GenreRepository genreRepository() {
         return Mockito.mock(GenreRepository.class);
     }
+
+    @Bean
+    public WebGraphQlSecurityInterceptor webGraphQlSecurityInterceptor() {
+        return new WebGraphQlSecurityInterceptor();
+    }
+
+    public static class WebGraphQlSecurityInterceptor implements WebGraphQlInterceptor {
+
+        private List<SimpleGrantedAuthority> authorities;
+
+        public WebGraphQlSecurityInterceptor() {
+            this.authorities = new ArrayList<>();
+        }
+
+        public void setAuthorities(final String... roles) {
+            if (roles == null) {
+                this.authorities = new ArrayList<>();
+            } else {
+                this.authorities = Arrays.stream(roles).map(SimpleGrantedAuthority::new).toList();
+            }
+        }
+
+        @Override
+        public Mono<WebGraphQlResponse> intercept(WebGraphQlRequest request, Chain chain) {
+            if (authorities.isEmpty()) {
+                return chain.next(request);
+            }
+
+            final var authenticated = UsernamePasswordAuthenticationToken.authenticated("JohnDoe", "123456", authorities);
+            final var context = SecurityContextHolder.getContext();
+            context.setAuthentication(authenticated);
+            return chain.next(request)
+                    .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(context)));
+        }
+    }
 }
