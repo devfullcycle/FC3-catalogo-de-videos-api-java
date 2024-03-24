@@ -206,4 +206,87 @@ public class CastMemberGraphQLControllerTest {
         Assertions.assertEquals(expectedCreatedAt, actualCategory.createdAt());
         Assertions.assertEquals(expectedUpdatedAt, actualCategory.updatedAt());
     }
+
+    @IntegrationTest
+    public static class E2ETest {
+
+        @MockBean
+        private ListCastMemberUseCase listCastMemberUseCase;
+
+        @MockBean
+        private SaveCastMemberUseCase saveCastMemberUseCase;
+
+        @Autowired
+        private MockMvc mvc;
+
+        @Autowired
+        private ObjectMapper mapper;
+
+        @Autowired
+        private WebGraphQlHandler webGraphQlHandler;
+
+        @Autowired
+        private WebGraphQlSecurityInterceptor interceptor;
+
+        @Test
+        void shouldRejectUnauthenticatedRequest() {
+            interceptor.setAuthorities();
+
+            final var document = "query castMembers { castMembers { id } }";
+            final var webGraphQlTester = WebGraphQlTester.create(webGraphQlHandler);
+            webGraphQlTester.document(document).execute()
+                    .errors().expect(err -> "Unauthorized".equalsIgnoreCase(err.getMessage()) && "castMembers".equals(err.getPath()))
+                    .verify();
+        }
+
+        @Test
+        void givenUserWithSubscriberRole_whenQueries_shouldReturn() {
+            interceptor.setAuthorities(Roles.ROLE_SUBSCRIBER);
+
+            final var document = "query castMembers { castMembers { id } }";
+
+            final var castMembers = List.of(
+                    ListCastMembersOutput.from(Fixture.CastMembers.gabriel()),
+                    ListCastMembersOutput.from(Fixture.CastMembers.wesley())
+            );
+
+            final var expectedPage = 0;
+            final var expectedPerPage = 10;
+
+            when(this.listCastMemberUseCase.execute(any()))
+                    .thenReturn(new Pagination<>(expectedPage, expectedPerPage, castMembers.size(), castMembers));
+
+            final var webGraphQlTester = WebGraphQlTester.create(webGraphQlHandler);
+            webGraphQlTester.document(document).execute()
+                    .errors().verify()
+                    .path("castMembers[*].id")
+                    .entityList(String.class)
+                    .isEqualTo(castMembers.stream().map(ListCastMembersOutput::id).toList());
+        }
+
+        @Test
+        void givenUserWithAdminRole_whenQueries_shouldReturn() {
+            interceptor.setAuthorities(Roles.ROLE_ADMIN);
+
+            final var document = "query castMembers { castMembers { id } }";
+
+            final var castMembers = List.of(
+                    ListCastMembersOutput.from(Fixture.CastMembers.gabriel()),
+                    ListCastMembersOutput.from(Fixture.CastMembers.wesley())
+            );
+
+            final var expectedPage = 0;
+            final var expectedPerPage = 10;
+
+            when(this.listCastMemberUseCase.execute(any()))
+                    .thenReturn(new Pagination<>(expectedPage, expectedPerPage, castMembers.size(), castMembers));
+
+            final var webGraphQlTester = WebGraphQlTester.create(webGraphQlHandler);
+            webGraphQlTester.document(document).execute()
+                    .errors().verify()
+                    .path("castMembers[*].id")
+                    .entityList(String.class)
+                    .isEqualTo(castMembers.stream().map(ListCastMembersOutput::id).toList());
+        }
+    }
 }
